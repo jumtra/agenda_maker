@@ -10,3 +10,4 @@ __pycache__
 temp
 *.csv
 dist
+*.rst
