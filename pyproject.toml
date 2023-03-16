@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agenda-maker"
-version = "0.1.2"
+version = "0.2.1"
 description = "Make Japanese Agenda"
 readme = "README.md"
 authors = ["jumtra"]
