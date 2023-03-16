@@ -1,0 +1,12 @@
+/.vscode
+/result/*
+/sample_data/*
+*.db
+data/*
+*.out
+__pycache__
+*.ipynb
+*.sh
+temp
+*.csv
+dist
