@@ -45,9 +45,9 @@ config.yaml
 # 実行するタスク設定
 tasks:
   wav_preprocess_is: True
-  annotation_is: False
-  transcription_is: False
-  transcription_eng_is: False
+  annotation_is: True
+  transcription_is: True
+  transcription_eng_is: True
   segmentation_is: True
   summarization_is: True
   translation_is: True
