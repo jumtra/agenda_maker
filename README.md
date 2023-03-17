@@ -17,24 +17,11 @@
 #### 実行方法
 基本的にpath_inputにwav,mp3,mp4形式のデータのパスを渡すことで議事録の生成が可能です。
 path_outputはデフォルトでresultディレクトリが指定されており、存在しない場合は作成して出力結果を格納します。
-config_pathはconfig.yamlのパスを指定します。デフォルトでは、ライブラリ内のconfig.yamlを読み込み、モデル各種のパラメーターを設定します。独自のパラメーターを設定したい場合は事項を参考にconfig.yamlを作成してファイルのパスを渡してください。
-
-* ライブラリを実行する場合
-```
-imprort agenda-maker
-agenda-maker.make_agenda(path_input = "入力ファイルのパス",path_output="出力先のパス",config_path = "パラメーター各種のyamlファイルのパス")
-```
+config_pathはconfig.yamlのパスを指定します。デフォルトでは、リポジトリ内のconfig.yamlを読み込み、モデル各種のパラメーターを設定します。独自のパラメーターを設定したい場合は事項を参考にconfig.yamlを作成してファイルのパスを渡してください。
 
 * コマンドラインで実行する場合
 ```
 agenda path_input = "入力ファイルのパス" path_output="出力先のパス" config_path = "パラメーター各種のyamlファイルのパス"
-```
-### config.yaml
-config.yamlは、音声から議事録を生成する際に使用される設定ファイルです。以下に、主な項目の説明を記します。
-* tasks: 実行するタスクを指定します。
-例えば、wav_preprocess_isがTrueなら、音声データの前処理を行います。
-* common: 全てのタスクで共通のパラメータを指定します。
-例えば、seedは乱数のシードを指定します。
 * preprocess: 音声データの前処理に関するパラメータを指定します。
 例えば、silence_cutでは、無音部分を分割の基準として利用します。
 * model: 各タスクで使用するモデルに関するパラメータを指定します。

@@ -21,8 +21,8 @@ common:
 
 preprocess:
   cut_time:
-    start_time: 0
-    end_time: 5
+    start_time: 0 # 音声データの初めてn秒カット
+    end_time: 5 # 音声データの終わりn秒カット
   silence_cut:
     min_silence_len: 500 #n秒以上無音なら分割
     silence_thresh: -60 #ndBFS以下で無音と判定
@@ -32,19 +32,19 @@ model:
   # 話者分離のパラメータ
   annotation:
     model_name: model_pyaudio
-    min_speakers: 1
-    max_speakers: 4
+    min_speakers: 1 # 発話している最小人数
+    max_speakers: 4 # 発話している最大人数
 
   # 文章分割のパラメータ
   # sementic segmentation のパラメータ
   segmentation:
-    max_segmented_text: 8000
-    segment_num: 4
+    max_segmented_text: 8000 # 1セグメントの最大文字数
+    segment_num: 4 # 最大セグメント数
     semantic_segmentation:
-      model_name: model_semantic_segmentation
+      model_name: model_semantic_segmentation 
       model_type: all-MiniLM-L6-v2 # SentenceTransformerのモデルタイプ
-      max_segment_text: 8000
-      threshold_step: 0.01
+      max_segment_text: 8000 # 1セグメントの最大文字数
+      threshold_step: 0.01 # 
       threshold: 0.6
     # text tillingのパラメータ
     text_tiling:
@@ -68,10 +68,10 @@ model:
       model_name: model_pegasus
       model_type: google/pegasus-large 
       tokenizer_type: google/pegasus-large 
-      min_length: 50
-      max_length: 1000
-      use_first: False
-      no_repeat_ngram_size: 3
+      min_length: 50 # 生成される最小文字数
+      max_length: 1000 # 生成される最大文字数
+      use_first: False # 最初の入力文字を使うか
+      no_repeat_ngram_size: 
       num_beams: 10
     pegasus_x:
       model_name: model_pegasusx
