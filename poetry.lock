@@ -2116,6 +2116,7 @@ typing-extensions = "*"
 [package.source]
 type = "url"
 url = "https://download.pytorch.org/whl/cu113/torch-1.12.0%2Bcu113-cp38-cp38-linux_x86_64.whl"
+
 [[package]]
 name = "torch-audiomentations"
 version = "0.11.0"
@@ -2162,6 +2163,7 @@ torch = "1.12.0"
 [package.source]
 type = "url"
 url = "https://download.pytorch.org/whl/cu113/torchaudio-0.12.0%2Bcu113-cp38-cp38-linux_x86_64.whl"
+
 [[package]]
 name = "torchmetrics"
 version = "0.11.4"
@@ -2206,6 +2208,7 @@ scipy = ["scipy"]
 [package.source]
 type = "url"
 url = "https://download.pytorch.org/whl/cu113/torchvision-0.13.0%2Bcu113-cp38-cp38-linux_x86_64.whl"
+
 [[package]]
 name = "tqdm"
 version = "4.65.0"
@@ -2425,7 +2428,7 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.9"
-content-hash = "2e871907fc61b824cf1e1ef4770f34f0b5aa69e93027125010711c24d30a29ba"
+content-hash = "5d6cdd695e5cbabb24c096de9e6cd0d1447c1ec8b83ce10579a28dc92850b3f3"
 
 [metadata.files]
 absl-py = [

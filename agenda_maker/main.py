@@ -1,4 +1,3 @@
-import argparse
 from pathlib import Path
 
 from agenda_maker.agenda_logic.allocate_speaker_logic import allocate_speaker

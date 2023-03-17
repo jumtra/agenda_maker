@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agenda-maker"
-version = "0.2.1"
+version = "0.2.1.4"
 description = "Make Japanese Agenda"
 readme = "README.md"
 authors = ["jumtra"]
@@ -14,14 +14,13 @@ classifiers = [
     "Environment :: Console",
     "License :: OSI Approved :: MIT License",
     'Programming Language :: Python :: 3',
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.8",
     "Topic :: Utilities",
 ]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.9"
 huggingface = "^0.0.1"
-numpy = "*"
 pandas = "^1.5.2"
 omegaconf = "^2.2.3"
 transformers = ">=4.19.0,<=4.25.1"
