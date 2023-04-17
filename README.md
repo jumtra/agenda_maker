@@ -20,7 +20,6 @@ path_outputはデフォルトでresultディレクトリが指定されており
 config_pathはconfig.yamlのパスを指定します。デフォルトでは、リポジトリ内のconfig.yamlを読み込み、モデル各種のパラメーターを設定します。独自のパラメーターを設定したい場合は事項を参考にconfig.yamlを作成してファイルのパスを渡してください。
 
 * コマンドラインで実行する場合
-```
 agenda path_input = "入力ファイルのパス" path_output="出力先のパス" config_path = "パラメーター各種のyamlファイルのパス"
 * preprocess: 音声データの前処理に関するパラメータを指定します。
 例えば、silence_cutでは、無音部分を分割の基準として利用します。
@@ -159,6 +158,7 @@ torchaudio = { url = "https://download.pytorch.org/whl/cu113/torchaudio-0.12.0%2
 torchvision = { url = "https://download.pytorch.org/whl/cu113/torchvision-0.13.0%2Bcu113-cp38-cp38-linux_x86_64.whl"}
 
 ```
+
 ```
 poetry install
 ```
