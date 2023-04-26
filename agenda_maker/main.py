@@ -8,7 +8,7 @@ from agenda_maker.agenda_logic.get_result_logic import (
     transcript_logic,
     translate_logic,
 )
-from agenda_maker.agenda_logic.make_agenda_logic import make_agenda
+from agenda_maker.agenda_logic.make_agenda_logic import format2agenda
 from agenda_maker.common.config_manager import ConfigManager
 from agenda_maker.common.log_handler import add_log_handler
 from agenda_maker.data.io import any2wav
@@ -137,7 +137,7 @@ def make_agenda(
 
     # make agenda
     logging.info("議事録の生成開始")
-    make_agenda(
+    format2agenda(
         file_name=Path(path_output) / "agenda",
         df_summary=df_translated,
         df_transcript_with_annotate=df_transcript_with_speaker,

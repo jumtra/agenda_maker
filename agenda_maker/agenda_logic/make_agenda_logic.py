@@ -5,11 +5,13 @@ import pandas as pd
 
 from agenda_maker.data_object.schema import AnnotateSchema, TranscriptSchema
 
-def make_agenda(
+
+def format2agenda(
     df_summary: pd.DataFrame,
     df_transcript_with_annotate: pd.DataFrame,
     file_name: str,
 ) -> None:
+    """議事録のフォーマットに修正"""
     today = datetime.now().strftime("%Y年%m月%d日")
     weekday = datetime.now().strftime("%a")
     list_speaker = _get_list_speaker(df=df_transcript_with_annotate)
