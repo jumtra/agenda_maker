@@ -5,9 +5,6 @@ import pandas as pd
 
 from agenda_maker.data_object.schema import AnnotateSchema, TranscriptSchema
 
-locale.setlocale(locale.LC_TIME, "ja_JP.UTF-8")
-
-
 def make_agenda(
     df_summary: pd.DataFrame,
     df_transcript_with_annotate: pd.DataFrame,
