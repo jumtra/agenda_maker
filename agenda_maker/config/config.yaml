@@ -1,8 +1,8 @@
 
 # 実行するタスク設定
 tasks:
-  wav_preprocess_is: True
-  annotation_is: True
+  wav_preprocess_is: False
+  annotation_is: False
   transcription_is: True
   transcription_eng_is: True
   segmentation_is: True

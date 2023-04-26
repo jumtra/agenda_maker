@@ -46,6 +46,7 @@ class Whisper(BaseModel):
             no_speech_threshold=self.no_speech_threshold,
             language="ja",
             task=task,
+            beam_size=10,
         )
         return ResultWhisper(
             engwords_per_line=self.config_manager.config.model.transcription.engwords_per_line,

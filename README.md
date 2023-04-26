@@ -22,6 +22,7 @@ config_pathはconfig.yamlのパスを指定します。デフォルトでは、�
 * コマンドラインで実行する場合
 ```
 agenda path_input = "入力ファイルのパス" path_output="出力先のパス" config_path = "パラメーター各種のyamlファイルのパス"
+```
 * preprocess: 音声データの前処理に関するパラメータを指定します。
 例えば、silence_cutでは、無音部分を分割の基準として利用します。
 * model: 各タスクで使用するモデルに関するパラメータを指定します。
