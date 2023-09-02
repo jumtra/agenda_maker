@@ -24,6 +24,7 @@ class SemanticTextSegmentation(BaseModel):
         self.threshold_step = self.config_manager.config.model.segmentation.semantic_segmentation.threshold_step
         self.max_segment_text = self.config_manager.config.model.segmentation.semantic_segmentation.max_segment_text
         self.model_type = self.config_manager.config.model.segmentation.semantic_segmentation.model_type
+        self.build_model()
 
     def build_model(self) -> None:
         self.set_params()

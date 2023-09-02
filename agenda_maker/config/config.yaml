@@ -1,15 +1,23 @@
 
 # 実行するタスク設定
 tasks:
-  wav_preprocess_is: False
-  annotation_is: False
-  transcription_is: True
-  segmentation_is: True
-  summarization_is: True
+  is_wav_preprocess: False
+  is_annotation: False
+  is_transcription: True
+  is_segmentation: True
+  is_summarization: True
 
 # 共通部分のパラメータ
 common:
   seed: 42
+
+output:
+  output_dir_base: result
+  output_dir:
+  path_segmented_file: ${output.output_dir}/segnmented.csv
+  path_summarized_file: ${output.output_dir}/summarized.csv
+  path_whisperx_file: ${output.output_dir}/whisperx.csv
+
 
 preprocess:
   cut_time:
@@ -21,7 +29,6 @@ preprocess:
     keep_silence: 50 #分割後Nmsは無音を残す
   
 model: 
-
   # 文章分割のパラメータ
   # sementic segmentation のパラメータ
   segmentation:
