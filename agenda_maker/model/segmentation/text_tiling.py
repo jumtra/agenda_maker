@@ -2,7 +2,7 @@ import numpy as np
 from janome.tokenizer import Tokenizer
 
 
-def texttiling_japanese(text, w=20, k=2) -> list[str]:
+def texttiling_japanese(text: str, w: int, k: int) -> list[str]:
     """
     text: 日本語の文章
     w: 窓の幅

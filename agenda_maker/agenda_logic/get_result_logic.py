@@ -12,55 +12,6 @@ from agenda_maker.model.base_model import BaseModel
 logger = logging.getLogger()
 
 
-def segmentation_logic(
-    list_use_models: List[BaseModel],
-    list_text: List[str],
-    is_segmentation: bool,
-    config_manager: ConfigManager,
-    path_output: str = None,
-):
-    """list_use_modelsの順番にsegmentation"""
-
-    def _is_split(list_text: list) -> bool:
-        for text in list_text:
-            if len(text) >= config_manager.config.model.segmentation.max_segmented_text:
-                return True
-            else:
-                continue
-        return False
-
-    def _is_break(list_text: list) -> bool:
-        return True if len(list_text) < 2 else False
-
-    if is_segmentation and (
-        len(reduce(lambda a, b: a + b, list_text))
-        > config_manager.config.model.segmentation.max_segmented_text
-    ):
-        for model in list_use_models:
-            logging.info(f"{model}を用いた文章分割開始")
-            model = model(config_manager)
-            model.build_model()
-            list_text = model.get_result(list_text=list_text)
-            if _is_split(list_text):
-                # TODO: 大きい章は分解する
-
-                pass
-            if _is_break(list_text):
-                pass
-                # TODO: 何かしら処理の必要性
-            logging.info(f"段落数：{len(list_text)}")
-            logging.info(f"{model}を用いた文章分割終了")
-
-        pd.DataFrame(list_text, columns=["text"]).to_csv(path_output, index=False)
-    elif not is_segmentation:
-        logging.info(f"文章分割skip")
-        list_text = pd.read_csv(Path(path_output))["text"].to_list()
-    else:
-        logging.info(f"文章分割する必要がありません")
-        return list_text
-    return list_text
-
-
 def annotate_logic(
     list_use_models: List[BaseModel],
     path_input: str,
@@ -105,9 +56,7 @@ def transcript_logic(
             result = model.get_result(path_input, is_translate)
             df_result = result.df_result
             df_result.to_csv(Path(path_output) / (file_name + ".csv"), index=False)
-            result.df_original.to_csv(
-                Path(path_output) / (file_name + "_original.csv"), index=False
-            )
+            result.df_original.to_csv(Path(path_output) / (file_name + "_original.csv"), index=False)
             logging.info(f"{model}を用いた文字起こし終了")
 
     else:
@@ -159,12 +108,8 @@ def translate_logic(
             model.build_model()
             list_translated = []
             for model_summarize in df_summary.columns:
-                list_translated_summary = model.get_result(
-                    list_text=df_summary[model_summarize].to_list()
-                )
-                list_translated.append(
-                    reduce(lambda a, b: a + b, list_translated_summary)
-                )
+                list_translated_summary = model.get_result(list_text=df_summary[model_summarize].to_list())
+                list_translated.append(reduce(lambda a, b: a + b, list_translated_summary))
             dict_result[model.model_name] = list_translated
             logging.info(f"{model}を用いた翻訳終了")
         df_result = pd.DataFrame(dict_result, index=df_summary.columns)
@@ -179,9 +124,7 @@ def translate_logic(
 # ルールベースセグメンテーション
 # TODO 改修する
 def get_list_text(df_doc_eng: pd.DataFrame, th_max: int = 600, use_pre_text: int = 2):
-    df_doc_eng["is_sep"] = df_doc_eng["text"].map(
-        lambda x: True if re.match(r".*[A-Za-z0-9][.]{1}$", str(x)) != None else False
-    )
+    df_doc_eng["is_sep"] = df_doc_eng["text"].map(lambda x: True if re.match(r".*[A-Za-z0-9][.]{1}$", str(x)) != None else False)
     df_doc_eng["len_sentence"] = df_doc_eng["text"].map(lambda x: len(x))
     df_doc_eng = df_doc_eng.query("len_sentence >= 20")
     df_doc_eng["cumsum"] = df_doc_eng["len_sentence"].cumsum()
