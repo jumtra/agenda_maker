@@ -1,4 +1,6 @@
 /.vscode
+.venv
+.mypy_cache
 /result/*
 /sample_data/*
 /model_dir/*
@@ -12,3 +14,4 @@ temp
 *.csv
 dist
 *.rst
+model_dir
