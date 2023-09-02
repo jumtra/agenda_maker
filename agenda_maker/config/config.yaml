@@ -35,11 +35,8 @@ model:
       threshold: 0.6
     # text tillingのパラメータ
     text_tiling:
-      model_name: model_text_tilling
-      w: 15 #Pseudosentence size
-      k: 10 #Size (in sentences) of the block used in the block comparison method
-      smoothing_width: 2 #The width of the window used by the smoothing method
-      smoothing_rounds: 10 #The number of smoothing passes
+      w: 10 #Pseudosentence size
+      k: 2 #Size (in sentences) of the block used in the block comparison method
 
   whisperx:
   # 文字起こしのパラメータ
