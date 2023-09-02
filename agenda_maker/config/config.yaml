@@ -28,7 +28,6 @@ model:
     max_segmented_text: 8000 # 1セグメントの最大文字数
     segment_num: 4 # 最大セグメント数
     semantic_segmentation:
-      model_name: model_semantic_segmentation 
       model_type: "pkshatech/GLuCoSE-base-ja" # SentenceTransformerのモデルタイプ
       max_segment_text: 8000 # 1セグメントの最大文字数
       threshold_step: 0.01 # 
