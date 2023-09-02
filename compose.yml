@@ -1,0 +1,16 @@
+version: '2.2'
+services:
+  myapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    runtime: nvidia
+      
+    volumes:
+      - /home:/home
+    ports:
+      - "6006:6006"  # Tensorboard用ポート
+      - "1234:1234"  # Tensorboard用ポート
+      - "8888:8888"  # JupyterLab用ポート
+    shm_size: 32gb
+    command: ["nvidia-smi"]
