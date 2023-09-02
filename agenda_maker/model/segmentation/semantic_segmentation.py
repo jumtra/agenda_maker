@@ -28,7 +28,6 @@ class SemanticTextSegmentation(BaseModel):
     def build_model(self) -> None:
         self.set_params()
         self.load_sentence_transformer()
-        self.load_spacy()
 
     def get_result(self, list_text: list[str]) -> list:
         self.max_segment_text = self._get_max_segment_text(list_text=list_text)
@@ -45,7 +44,7 @@ class SemanticTextSegmentation(BaseModel):
         list_sim = [0.0]
         for index, (text1, text2) in enumerate(zip(segments[:-1], segments[1:])):
             sim = self._get_similarity(text1, text2)
-            list_sim.append(sim[0][0])
+            list_sim.append(sim)
             if sim >= threshold:
                 segment_map.append(0)
             else:
