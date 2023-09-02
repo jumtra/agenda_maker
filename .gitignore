@@ -1,6 +1,7 @@
 /.vscode
 /result/*
 /sample_data/*
+/model_dir/*
 *.db
 data/*
 *.out
