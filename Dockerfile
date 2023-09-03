@@ -49,12 +49,13 @@ RUN apt-get update && apt-get install -y -o Dpkg::Options::="--force-confdef" -o
     make \
     ffmpeg  \
     && apt-get -y clean all
-RUN python -m pip install poetry
+#RUN python -m pip install poetry
 
 WORKDIR /home/
-RUN git clone https://github.com/jumtra/agenda_maker.git
+#RUN git clone https://github.com/jumtra/agenda_maker.git
 RUN cd agenda_maker
 RUN poetry install
+RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python --no-cache-dir
 
 
 
