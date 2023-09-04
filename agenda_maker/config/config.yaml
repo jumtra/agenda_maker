@@ -5,6 +5,10 @@ tasks:
   is_transcript: True
   is_segmentate: True
   is_summarize: True
+  is_wav_preprocess: True
+  is_transcript: True
+  is_segmentate: True
+  is_summarize: True
 
 # 共通部分のパラメータ
 common:
@@ -16,6 +20,8 @@ output:
   path_segmented_file: ${output.output_dir}/segnmented.csv
   path_summarized_file: ${output.output_dir}/summarized.csv
   path_whisperx_file: ${output.output_dir}/whisperx.csv
+  path_seg_word_file: ${output.output_dir}/seg_word.csv
+  path_agenda_file: ${output.output_dir}/agenda
   path_seg_word_file: ${output.output_dir}/seg_word.csv
   path_agenda_file: ${output.output_dir}/agenda
 
@@ -37,13 +43,35 @@ model:
     min_segment_text: 400 # 1セグメントの最小文字数
     max_segment_num: 4 # 最大セグメント数
     min_segment_num: 4 # 最大セグメント数
+    max_segment_text: 2000 # 1セグメントの最大文字数
+    min_segment_text: 400 # 1セグメントの最小文字数
+    max_segment_num: 4 # 最大セグメント数
+    min_segment_num: 4 # 最大セグメント数
     semantic_segmentation:
       model_type: "pkshatech/GLuCoSE-base-ja" # SentenceTransformerのモデルタイプ
       threshold_step: 0.01 # 
       threshold: 0.5
     # text tillingのパラメータ
     texttiling:
+    texttiling:
       w: 10 #Pseudosentence size
+      k: 5 #Size (in sentences) of the block used in the block comparison method
+
+  summarization:
+    model_path: ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf
+    is_gpu_compile: False #llama.cppでcublasを使っているかどうか
+    n_ctx: 2048
+    n_gpu_layers: 100
+    params:
+      temperature: 0.5
+      top_p: 0.3
+      top_k: 40
+      repeat_penalty: 1.1
+      max_tokens: 2042
+      stop:
+        - "ASSISTANT:"
+        - "USER:"
+        - "SYSTEM:"
       k: 5 #Size (in sentences) of the block used in the block comparison method
 
   summarization:

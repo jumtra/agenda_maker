@@ -52,6 +52,7 @@ RUN apt-get update && apt-get install -y -o Dpkg::Options::="--force-confdef" -o
     ffmpeg  \
     && apt-get -y clean all
 RUN python -m pip install poetry
+RUN python -m pip install poetry
 
 # GET AGENDA MAKER
 # GET LLM
