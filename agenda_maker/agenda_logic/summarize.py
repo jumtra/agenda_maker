@@ -16,7 +16,7 @@ def summarize(df_segmented: pd.DataFrame, config_manager: ConfigManager, key_tex
     for text in tqdm(list_text, desc="Summarize"):
         _text = model.get_result(text)
         try:
-            list_result.append(re.split(r"要約:|要約結果:", _text))
+            list_result.append(re.split(r"要約:|要約結果:", _text)[-1])
         except:
             list_result.append(_text)
 

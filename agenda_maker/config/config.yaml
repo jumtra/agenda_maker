@@ -67,7 +67,7 @@ model:
     whisper:
       model_type: large-v2
       compute_type: float16
-      batch_size: 1 # 1batch 4gb位
+      batch_size: 1 # 1batch 5gb位
     # 話者分離のパラメータ
     diarization:
       min_speakers: 1 # 発話している最小人数

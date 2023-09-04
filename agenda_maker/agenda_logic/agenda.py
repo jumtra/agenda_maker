@@ -67,22 +67,22 @@ def _agenda_format(
 
         for speaker in list_speaker:
             f.write(f"・{speaker}様 \n")
-            # f.write("\n")
-            # f.write(f"【資料】\n")
-            # f.write("・ \n")
-            # f.write("\n")
-            # f.write(f"【決定事項】 \n")
-            # f.write("\n")
-            # f.write(f"【TODO】 \n")
-            # f.write("\n")
-            # f.write(f"【主な議事事項】 \n")
+        # f.write("\n")
+        # f.write(f"【資料】\n")
+        # f.write("・ \n")
+        # f.write("\n")
+        # f.write(f"【決定事項】 \n")
+        # f.write("\n")
+        # f.write(f"【TODO】 \n")
+        # f.write("\n")
+        # f.write(f"【主な議事事項】 \n")
 
-            text_summary = "".join(list_summary)
-            f.write(f"【要約結果】 \n")
-            list_formated_summary = _summary_format(texts=text_summary)
-            for doc in list_formated_summary:
-                f.write(doc)
-            f.write("\n")
+        text_summary = "".join(list_summary)
+        f.write(f"【要約結果】 \n")
+        list_formated_summary = _summary_format(texts=text_summary)
+        for doc in list_formated_summary:
+            f.write(doc)
+        f.write("\n")
         f.write("\n")
 
         f.write(f"【会議の流れ】 \n")
