@@ -9,193 +9,184 @@
 
 * 文字起こし：Whisperと呼ばれる音声認識技術を使用して、音声データからテキストへの変換を行います。
 * 話者割り当て：Pyannoteというライブラリを使用して、音声データから話者を自動的に分離します。
-* テキストセグメンテーション：TextTillingやTransformerを使用して、テキストを段落に分割します。
-* 要約：Pegasusという言語モデルを使用して、生成されたテキストを要約します。
-* 翻訳：FuguMtという翻訳モデルを使用して、要約結果を翻訳します。
+* テキストセグメンテーション：TextTillingやSentenceTransformerを使用して、テキストを段落に分割します。
+* 要約：LLama2 ELYZAを使用して、生成されたテキストを要約します。
+* 文書校正：LLama2 ELYZAを使用して、生成されたテキストを文章校正します。
 
 ## 使い方
 #### 実行方法
 基本的にpath_inputにwav,mp3,mp4形式のデータのパスを渡すことで議事録の生成が可能です。
-path_outputはデフォルトでresultディレクトリが指定されており、存在しない場合は作成して出力結果を格納します。
-config_pathはconfig.yamlのパスを指定します。デフォルトでは、リポジトリ内のconfig.yamlを読み込み、モデル各種のパラメーターを設定します。独自のパラメーターを設定したい場合は事項を参考にconfig.yamlを作成してファイルのパスを渡してください。
 
 * コマンドラインで実行する場合
-agenda path_input = "入力ファイルのパス" path_output="出力先のパス" config_path = "パラメーター各種のyamlファイルのパス"
+  - agenda path_input = "入力ファイルのパス"
+  - path_output="出力先のパス" 
+  - config_path = "パラメーター各種のyamlファイルのパス"
+
+## 実行環境
+
+- OS: Ubuntu20.04
+- CPU: Rythen7 3700X
+- GPU: GEFORCE RTX2070 SUPER(8GB)
+- MEMORY: 32GB
+
+## 環境構築
+
+
+### Dockerを使う場合
+make, dockerが必要です。
+
+* make version
+
 ```
-* preprocess: 音声データの前処理に関するパラメータを指定します。
-例えば、silence_cutでは、無音部分を分割の基準として利用します。
-* model: 各タスクで使用するモデルに関するパラメータを指定します。
-例えば、segmentationでは、文書を分割する際に用いるSemantic SegmentationやText Tilingのパラメータが指定されています。また、summarizationでは、PegasusやPegasusXといった要約モデルのパラメータが指定されています。
-
-config.yaml
-```
-# 実行するタスク設定
-tasks:
-  wav_preprocess_is: True
-  annotation_is: True
-  transcription_is: True
-  transcription_eng_is: True
-  segmentation_is: True
-  summarization_is: True
-  translation_is: True
-
-# 共通部分のパラメータ
-common:
-  seed: 42
-  use_models:
-    annotation: [model_pyaudio]
-    segmentation: [model_text_tilling,model_semantic_segmentation,model_transformer_text_classify]
-    summarization: [model_pegasus,model_pegasusx]
-    translation: [model_marianmt]
-    transcription: [model_whisper]
-
-preprocess:
-  cut_time:
-    start_time: 0
-    end_time: 5
-  silence_cut:
-    min_silence_len: 500 #n秒以上無音なら分割
-    silence_thresh: -60 #ndBFS以下で無音と判定
-    keep_silence: 50 #分割後Nmsは無音を残す
-  
-model: 
-  # 話者分離のパラメータ
-  annotation:
-    model_name: model_pyaudio
-    min_speakers: 1
-    max_speakers: 4
-
-  # 文章分割のパラメータ
-  # sementic segmentation のパラメータ
-  segmentation:
-    max_segmented_text: 8000
-    segment_num: 4
-    semantic_segmentation:
-      model_name: model_semantic_segmentation
-      model_type: all-MiniLM-L6-v2 # SentenceTransformerのモデルタイプ
-      max_segment_text: 8000
-      threshold_step: 0.01
-      threshold: 0.6
-    # text tillingのパラメータ
-    text_tiling:
-      model_name: model_text_tilling
-      w: 15 #Pseudosentence size
-      k: 10 #Size (in sentences) of the block used in the block comparison method
-      smoothing_width: 2 #The width of the window used by the smoothing method
-      smoothing_rounds: 10 #The number of smoothing passes
-    # 文章類似セグメンテーションのパラメータ
-    bert:
-      model_name: model_transformer_text_classify
-      model_type: dennlinger/bert-wiki-paragraphs
-      max_segment_text: 8000
-      threshold_step: 0.01
-      threshold: 0.6
-
-  # 要約のパラメータ
-  summarization:
-    max_summary_text: 1000
-    pegasus:
-      model_name: model_pegasus
-      model_type: google/pegasus-large 
-      tokenizer_type: google/pegasus-large 
-      min_length: 50
-      max_length: 1000
-      use_first: False
-      no_repeat_ngram_size: 3
-      num_beams: 10
-    pegasus_x:
-      model_name: model_pegasusx
-      model_type: google/pegasus-x-large 
-      tokenizer_type: google/pegasus-x-large 
-      min_length: 50
-      max_length: 1000
-      use_first: False
-      no_repeat_ngram_size: 3
-      num_beams: 10
-  # 翻訳のパラメータ
-  translation:
-    marian:
-      model_name: model_marianmt
-      model_type: staka/fugumt-en-ja
-      tokenizer_type: staka/fugumt-en-ja
-      max_length: 1100
-      no_repeat_ngram_size: 3
-      num_beams: 10
-      input_max_length: 1100
-
-  # 文字起こしのパラメータ
-  transcription:
-    engwords_per_line: 20 # 英語データフレーム上の最小文字数
-    jpwords_per_line: 10 # 日本語データフレーム上の最小文字数
-    whisper:
-      model_name: model_whisper
-      model_type: large-v2
-      verbose: False
-      condition_on_previous_text: True # default True
-      logprob_threshold: -1.0
-      no_speech_threshold: 0.6
+GNU Make 4.2.1
+Built for x86_64-pc-linux-gnu
+Copyright (C) 1988-2016 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
 ```
 
-## インストール
+* docker version
+```
+Docker version 24.0.5, build ced0996
+```
+
+#### 1. HF_TOKENの設定
+
+.env内にHF_TOKENを入力してください。
+
+```.env
+HF_TOKEN =hf_xxxx
+```
+
+#### 2. モデルのダウンロード
+以下のコマンドでモデルをダウンロード
+
+```
+make prepare
+```
+
+#### 3. コンテナビルド
+以下のコマンドでモデルをダウンロード
+
+```
+make start
+```
+
+#### 4. コンテナクローズ
+以下のコマンドでdockerを終了してキャッシュを削除
+```
+make stop
+make clear
+```
+
+### ローカルで環境構築する場合
 #### 1. 事前準備
-* Python 3.8のインストール
-本ライブラリはPython 3.8系でのみ実行確認をしています。
+* Python 3.10のインストール
+本ライブラリはPython 3.10系でのみ実行確認をしています。
 
 * FFmpegのインストール
-Whisperの使用や音声データの加工をするために必要です。
+Whisperxの使用や音声データの加工をするために必要です。
 
 * Hugging Faceアカウント
 各種モデルをHugging Face Hubからインストールするために使用します。ログインできれば問題ありません。
+
+**HF_TOKEN**を取得するために使用します。
 #### 2. 必要なライブラリのインストール
-* torch1.2.1+cuxxのインストール
-cudaとtorchのバージョンが合わないため再インストールを行ってください。
-
-poetryを利用する場合は以下の手順を参考にインストールしてください。
+以下のコマンドでpoetry.lockから依存関係をインストール
 ```
-pyproject.toml[tool.poetry.dependencies]に以下を追加
+poetry config installer.max-workers 10
+poetry install --no-interaction --no-ansi -vvv
+```
+* llama-cpp-pythonのインストール
+  - CPUを使う場合
 
-torch = {url ="https://download.pytorch.org/whl/cu113/torch-1.12.0%2Bcu113-cp38-cp38-linux_x86_64.whl"}
-torchaudio = { url = "https://download.pytorch.org/whl/cu113/torchaudio-0.12.0%2Bcu113-cp38-cp38-linux_x86_64.whl"}
-torchvision = { url = "https://download.pytorch.org/whl/cu113/torchvision-0.13.0%2Bcu113-cp38-cp38-linux_x86_64.whl"}
+  ```
+  CMAKE_ARGS="-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS" FORCE_CMAKE=1 pip install llama-cpp-python==0.1.83 --no-cache-dir
+  ```
+  - GPUを使う場合
+
+  ```
+  CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 python3 -m pip install llama-cpp-python==0.1.83 --no-cache-dir
+  ```
+## 実行方法
+
+以下のコマンドで実行可能
 
 ```
-
-```
-poetry install
+python agenda_maker/cli.py
 ```
 
-
-* en_core_web_smのインストール
-以下のコマンドを実行
-
+引数は、以下のものを使用
 ```
-python -m spacy download en_core_web_sm 
+options:
+  -h, --help            show this help message and exit
+  -config CONFIG_PATH, --config_path CONFIG_PATH
+  -input INPUT_PATH, --input_path INPUT_PATH(mp3 or mp4 or wav)
+  -output OUTPUT_NAME, --output_name OUTPUT_NAME
 ```
+## コンフィグの設定
 
-## ライセンス
+| パラメータ                           | 説明                                                                                                  |
+|----------------------------------|-------------------------------------------------------------------------------------------------------|
+| **tasks**                         | 実行するタスク設定                                                                                      |
+| is_wav_preprocess                | True: WAV前処理を実行する、False: 実行しない                                                       |
+| is_transcript                    | True: テキスト変換を実行する、False: 実行しない                                                      |
+| is_segmentate                    | True: セグメンテーションを実行する、False: 実行しない                                                 |
+| is_summarize                     | True: 要約を実行する、False: 実行しない                                                              |
+| **common**                        | 共通部分のパラメータ                                                                                     |
+| seed                             | 乱数生成のシード値                                                                                     |
+| **output**                        | 出力設定                                                                                              |
+| output_dir_base                  | ベースの出力ディレクトリ名                                                                               |
+| output_dir                       | 出力ディレクトリの詳細な設定（以下のファイルの出力ディレクトリを指定）                                    |
+| path_segmented_file              | セグメンテーション結果のCSVファイルの出力パス                                                         |
+| path_summarized_file             | 要約結果のCSVファイルの出力パス                                                                       |
+| path_whisperx_file               | Whisperx結果のCSVファイルの出力パス                                                                   |
+| path_seg_word_file               | セグメンテーションされた単語のCSVファイルの出力パス                                                    |
+| path_agenda_file                 | アジェンダファイルの出力パス                                                                           |
+| **preprocess**                    | プリプロセス設定                                                                                       |
+| cut_time                         | 音声データのカット設定                                                                                 |
+| start_time                       | 音声データの初めてn秒をカット                                                                         |
+| end_time                         | 音声データの終わりn秒をカット                                                                         |
+| silence_cut                      | 無音のカット設定                                                                                      |
+| min_silence_len                  | n秒以上無音なら分割                                                                                   |
+| silence_thresh                   | ndBFS以下で無音と判定                                                                                  |
+| keep_silence                     | 分割後Nmsは無音を残す                                                                                 |
+| **model**                         | モデル設定                                                                                             |
+| **segmentation**                  | 文章分割のパラメータ                                                                                    |
+| max_segment_text                 | 1セグメントの最大文字数                                                                               |
+| min_segment_text                 | 1セグメントの最小文字数                                                                               |
+| max_segment_num                  | 最大セグメント数                                                                                       |
+| min_segment_num                  | 最小セグメント数                                                                                       |
+| semantic_segmentation            | セマンティックセグメンテーションの設定                                                                |
+| model_type                       | SentenceTransformerのモデルタイプ                                                                       |
+| threshold_step                   | 閾値ステップ設定                                                                                        |
+| threshold                        | 閾値設定                                                                                              |
+| texttiling                       | テキストティリングのパラメータ                                                                         |
+| w                                | 擬似文のサイズ                                                                                         |
+| k                                | ブロック比較法で使用されるブロックのサイズ                                                             |
+| summarization                    | 要約のパラメータ                                                                                        |
+| model_path                       | 要約モデルのパス                                                                                        |
+| is_gpu_compile                   | llama.cppでcublasを使用するかどうかの設定                                                              |
+| n_ctx                            | コンテキストサイズ                                                                                     |
+| n_gpu_layers                     | GPUレイヤー数                                                                                          |
+| params                           | 要約のパラメータ                                                                                        |
+| temperature                      | 温度設定                                                                                              |
+| top_p                            | Top-pサンプリングの閾値設定                                                                           |
+| top_k                            | Top-kサンプリングの閾値設定                                                                           |
+| repeat_penalty                   | リピートのペナルティ設定                                                                               |
+| max_tokens                       | 最大トークン数                                                                                         |
+| stop                             | 停止ワードの設定                                                                                       |
+| whisperx                         | Whisperx設定                                                                                          |
+| whisper                          | 文字起こしのパラメータ                                                                                  |
+| model_type                       | Whisperモデルのタイプ                                                                                  |
+| compute_type                     | 計算タイプ（float16など）                                                                              |
+| batch_size                       | バッチサイズ                                                                                            |
+| diarization                      | 話者分離のパラメータ                                                                                   |
+| min_speakers                     | 発話している最小人数                                                                                   |
+| max_speakers                     | 発話している最大人数                                                                                   |
 
-本プロジェクトで使用したモデルのライセンスは以下です。
-* Pyannote
-    - License：MIT licence
-    - 参照：https://huggingface.co/pyannote/speaker-diarization
-
-* Whisper
-    - License：MIT licence
-    - 参照：https://github.com/openai/whisper
-
-* Pegasus
-    - License：Apache License 2.0
-    - 参照：https://github.com/google-research/pegasus
-
-* FuguMT
-    - License：CC BY-SA 4.0
-    - 参照：https://staka.jp/wordpress/?p=413
-* bert-wiki-paragraphs
-    - License：MIT licence
-    - 参照：https://huggingface.co/dennlinger/bert-wiki-paragraphs
 ## 作成者
 
 * jumtras
-
-## サポート
 
