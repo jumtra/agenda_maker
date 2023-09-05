@@ -1,0 +1,15 @@
+version: '2.2'
+services:
+  apps:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - HF_TOKEN=${HF_TOKEN}
+    tty: true
+    image: agenda_maker:latest
+    runtime: nvidia
+    ports:
+      - "6006:6006"  # Gradio用ポート
+    shm_size: 32gb
+    command: ["/bin/bash"]

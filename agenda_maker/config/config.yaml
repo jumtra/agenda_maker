@@ -1,23 +1,24 @@
 
 # 実行するタスク設定
 tasks:
-  wav_preprocess_is: False
-  annotation_is: False
-  transcription_is: True
-  transcription_eng_is: True
-  segmentation_is: True
-  summarization_is: True
-  translation_is: True
+  is_wav_preprocess: True
+  is_transcript: True
+  is_segmentate: True
+  is_summarize: True
 
 # 共通部分のパラメータ
 common:
   seed: 42
-  use_models:
-    annotation: [model_pyaudio]
-    segmentation: [model_text_tilling,model_semantic_segmentation,model_transformer_text_classify]
-    summarization: [model_pegasus,model_pegasusx]
-    translation: [model_marianmt]
-    transcription: [model_whisper]
+
+output:
+  output_dir_base: result
+  output_dir:
+  path_segmented_file: ${output.output_dir}/segnmented.csv
+  path_summarized_file: ${output.output_dir}/summarized.csv
+  path_whisperx_file: ${output.output_dir}/whisperx.csv
+  path_seg_word_file: ${output.output_dir}/seg_word.csv
+  path_agenda_file: ${output.output_dir}/agenda
+
 
 preprocess:
   cut_time:
@@ -29,78 +30,46 @@ preprocess:
     keep_silence: 50 #分割後Nmsは無音を残す
   
 model: 
-  # 話者分離のパラメータ
-  annotation:
-    model_name: model_pyaudio
-    min_speakers: 1 # 発話している最小人数
-    max_speakers: 4 # 発話している最大人数
-
   # 文章分割のパラメータ
   # sementic segmentation のパラメータ
   segmentation:
-    max_segmented_text: 8000 # 1セグメントの最大文字数
-    segment_num: 4 # 最大セグメント数
+    max_segment_text: 2000 # 1セグメントの最大文字数
+    min_segment_text: 300 # 1セグメントの最小文字数
+    max_segment_num: 4 # 最大セグメント数
+    min_segment_num: 4 # 最大セグメント数
     semantic_segmentation:
-      model_name: model_semantic_segmentation 
-      model_type: all-MiniLM-L6-v2 # SentenceTransformerのモデルタイプ
-      max_segment_text: 8000 # 1セグメントの最大文字数
+      model_type: "pkshatech/GLuCoSE-base-ja" # SentenceTransformerのモデルタイプ
       threshold_step: 0.01 # 
-      threshold: 0.6
+      threshold: 0.5
     # text tillingのパラメータ
-    text_tiling:
-      model_name: model_text_tilling
-      w: 15 #Pseudosentence size
-      k: 10 #Size (in sentences) of the block used in the block comparison method
-      smoothing_width: 2 #The width of the window used by the smoothing method
-      smoothing_rounds: 10 #The number of smoothing passes
-    # 文章類似セグメンテーションのパラメータ
-    bert:
-      model_name: model_transformer_text_classify
-      model_type: dennlinger/bert-wiki-paragraphs
-      max_segment_text: 8000
-      threshold_step: 0.01
-      threshold: 0.6
+    texttiling:
+      w: 10 #Pseudosentence size
+      k: 5 #Size (in sentences) of the block used in the block comparison method
 
-  # 要約のパラメータ
   summarization:
-    max_summary_text: 1000
-    pegasus:
-      model_name: model_pegasus
-      model_type: google/pegasus-large 
-      tokenizer_type: google/pegasus-large 
-      min_length: 50 # 生成される最小文字数
-      max_length: 1000 # 生成される最大文字数
-      use_first: False # 最初の入力文字を使うか
-      no_repeat_ngram_size: 
-      num_beams: 10
-    pegasus_x:
-      model_name: model_pegasusx
-      model_type: google/pegasus-x-large 
-      tokenizer_type: google/pegasus-x-large 
-      min_length: 50
-      max_length: 1000
-      use_first: False
-      no_repeat_ngram_size: 3
-      num_beams: 10
-  # 翻訳のパラメータ
-  translation:
-    marian:
-      model_name: model_marianmt
-      model_type: staka/fugumt-en-ja
-      tokenizer_type: staka/fugumt-en-ja
-      max_length: 1100
-      no_repeat_ngram_size: 3
-      num_beams: 10
-      input_max_length: 1100
+    model_path: ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf
+    is_gpu_compile: True #llama.cppでcublasを使っているかどうか
+    n_ctx: 2048
+    n_gpu_layers: 100
+    params:
+      temperature: 0.5
+      top_p: 0.3
+      top_k: 40
+      repeat_penalty: 1.1
+      max_tokens: 2042
+      stop:
+        - "ASSISTANT:"
+        - "USER:"
+        - "SYSTEM:"
 
+
+  whisperx:
   # 文字起こしのパラメータ
-  transcription:
-    engwords_per_line: 20 # 英語データフレーム上の最小文字数
-    jpwords_per_line: 10 # 日本語データフレーム上の最小文字数
     whisper:
-      model_name: model_whisper
       model_type: large-v2
-      verbose: False
-      condition_on_previous_text: True # default True
-      logprob_threshold: -1.0
-      no_speech_threshold: 0.6
+      compute_type: float16
+      batch_size: 1 # 1batch 5gb位
+    # 話者分離のパラメータ
+    diarization:
+      min_speakers: 1 # 発話している最小人数
+      max_speakers: 4 # 発話している最大人数

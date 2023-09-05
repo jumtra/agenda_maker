@@ -10,11 +10,12 @@ from agenda_maker.common.config_manager import ConfigManager
 logger = logging.getLogger()
 
 
-def any2wav(path_input: str, path_out: str, config_manager: ConfigManager) -> str:
-    """mp3,mp4をwav形式に変換"""
+def preprocess(path_input: str, config_manager: ConfigManager) -> str:
+    """mp3,mp4を前処理したwav形式に変換"""
 
     # 拡張子の取得
     name_extention = path_input.split(".")[-1]
+    path_out = path_input.split(".")[0] + f"from{name_extention}_convert_to.wav"
 
     if name_extention == "mp3":
         logger.info("convert to wav ... ")
@@ -27,7 +28,7 @@ def any2wav(path_input: str, path_out: str, config_manager: ConfigManager) -> st
         path_wav_input = path_input
     else:
         logger.error(Exception("only use mp3,mp4,wav"))
-    if config_manager.config.tasks.wav_preprocess_is:
+    if config_manager.config.tasks.is_wav_preprocess:
         preprocess_wav(path_input=path_wav_input, config_manager=config_manager)
     else:
         logger.info("skip preprocess wav")
@@ -36,17 +37,17 @@ def any2wav(path_input: str, path_out: str, config_manager: ConfigManager) -> st
 
 def mp32wav(path_mp3: str, path_out: str) -> str:
     sound = AudioSegment.from_mp3(Path(path_mp3))
-    sound.export(Path(path_out) / "full.wav", format="wav", parameters=["-ar", "16000"])
+    sound.export(Path(path_out), format="wav", parameters=["-ar", "16000"])
     logger.info("変換終了")
-    return path_out + "/full.wav"
+    return path_out
 
 
 def mp42wav(path_mp4: str, path_out: str) -> str:
     stream = ffmpeg.input(Path(path_mp4))
-    stream = ffmpeg.output(stream, path_out + "/full.wav")
+    stream = ffmpeg.output(stream, path_out)
     ffmpeg.run(stream, quiet=True, overwrite_output=True)
     logger.info("変換終了")
-    return path_out + "/full.wav"
+    return path_out
 
 
 def preprocess_wav(path_input: str, config_manager: ConfigManager) -> None:
