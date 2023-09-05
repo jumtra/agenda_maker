@@ -33,7 +33,7 @@ model:
   # 文章分割のパラメータ
   # sementic segmentation のパラメータ
   segmentation:
-    max_segment_text: 2000 # 1セグメントの最大文字数
+    max_segment_text: 1900 # 1セグメントの最大文字数
     min_segment_text: 300 # 1セグメントの最小文字数
     max_segment_num: 4 # 最大セグメント数
     min_segment_num: 4 # 最大セグメント数
