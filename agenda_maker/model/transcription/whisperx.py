@@ -85,11 +85,7 @@ class WhisperX(BaseModel):
     def build_model(self) -> None:
         self.set_params()
         logger.info("Build Model")
-        self.model = whisperx.load_model(
-            self.model_type,
-            self.device,
-            compute_type=self.compute_type,
-        )
+        self.model = whisperx.load_model(self.model_type, self.device, compute_type=self.compute_type)
 
     def set_params(self):
         whisper_params = self.config_manager.config.model.whisperx.whisper
@@ -106,7 +102,7 @@ class WhisperX(BaseModel):
     def get_result(self, input_path: str) -> ResultWhisper:
         self.build_model()
         audio = whisperx.load_audio(input_path)
-        result = self.model.transcribe(audio, batch_size=self.batch_size, print_progress=True)
+        result = self.model.transcribe(audio, batch_size=self.batch_size)
         segments = result["segments"]
         language = result["language"]
         release_gpu_memory(self.model)
@@ -119,8 +115,6 @@ class WhisperX(BaseModel):
             audio,
             self.device,
             return_char_alignments=False,
-            print_progress=True,
-            total_segments=len(segments),
         )
         release_gpu_memory(model_a)
 
@@ -128,7 +122,7 @@ class WhisperX(BaseModel):
         diarize_model = whisperx.DiarizationPipeline(device=self.device)
 
         # add min/max number of speakers if known
-        diarize_segments = diarize_model(audio, min_speakers=self.min_speakers, max_speakers=self.max_speakers)
+        diarize_segments = diarize_model(input_path, min_speakers=self.min_speakers, max_speakers=self.max_speakers)
         release_gpu_memory(diarize_model)
 
         result = whisperx.assign_word_speakers(diarize_segments, result)
