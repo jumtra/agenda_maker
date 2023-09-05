@@ -61,7 +61,6 @@ model:
         - "ASSISTANT:"
         - "USER:"
         - "SYSTEM:"
-      k: 5 #Size (in sentences) of the block used in the block comparison method
 
 
   whisperx:

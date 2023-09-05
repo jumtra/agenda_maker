@@ -102,7 +102,8 @@ class WhisperX(BaseModel):
     def get_result(self, input_path: str) -> ResultWhisper:
         self.build_model()
         audio = whisperx.load_audio(input_path)
-        result = self.model.transcribe(audio, batch_size=self.batch_size)
+
+        result = self.model.transcribe(audio, batch_size=self.batch_size, print_progress=True)
         segments = result["segments"]
         language = result["language"]
         release_gpu_memory(self.model)
@@ -115,6 +116,8 @@ class WhisperX(BaseModel):
             audio,
             self.device,
             return_char_alignments=False,
+            print_progress=True,
+            total_segments=len(segments),
         )
         release_gpu_memory(model_a)
 

@@ -15,7 +15,7 @@ def preprocess(path_input: str, config_manager: ConfigManager) -> str:
 
     # 拡張子の取得
     name_extention = path_input.split(".")[-1]
-    path_out = path_input.split(".")[0] + "_converted_wav.wav"
+    path_out = path_input.split(".")[0] + f"from{name_extention}_convert_to.wav"
 
     if name_extention == "mp3":
         logger.info("convert to wav ... ")
