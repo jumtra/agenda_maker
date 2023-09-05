@@ -56,13 +56,15 @@ RUN python -m pip install poetry
 
 # GET AGENDA MAKER
 # GET LLM
+WORKDIR /home/
 COPY agenda_maker agenda_maker
 COPY pyproject.toml pyproject.toml
 COPY ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf 
 COPY README.md README.md
 RUN cd agenda_maker
-RUN poetry install
-RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python --no-cache-dir
+RUN poetry config installer.max-workers 10
+RUN poetry install --no-interaction --no-ansi -vvv
+RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install llama-cpp-python==0.1.83 --no-cache-dir
 
 
 # for Tensorboard
