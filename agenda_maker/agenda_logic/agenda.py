@@ -10,7 +10,7 @@ from agenda_maker.common.config_manager import ConfigManager
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-config", "--config_path", default="agenda_maker/config/config.yaml", type=str)
-    parser.add_argument("-output", "--output_name", default="test", type=str)
+    parser.add_argument("-output", "--output_name", default="result", type=str)
 
     args = parser.parse_args()
     config_path = args.config_path
@@ -59,14 +59,15 @@ def _agenda_format(
     list_summary: list,
     list_transcript: list,
 ) -> None:
-    with open(f"{file_name}.txt", "w") as f:
-        f.write("【議事名】:xxxxx \n")
-        f.write(f"【日　時】{today} ({weekday}) \n")
-        f.write(f"【場　所】Meet (Web Meeting) \n")
-        f.write(f"【出席者（敬称略）】\n")
+    with open(f"{file_name}.md", "w") as f:
+        f.write("## 基本情報\n")
+        f.write("【議事名】\txxxxx \n")
+        f.write(f"\n【日　時】\t{today} ({weekday}) \n")
+        f.write(f"\n【場　所】\tMeet (Web Meeting) \n")
+        f.write(f"\n【出席者（敬称略）】\n")
 
         for speaker in list_speaker:
-            f.write(f"・{speaker}様 \n")
+            f.write(f"- {speaker}様 \n")
         # f.write("\n")
         # f.write(f"【資料】\n")
         # f.write("・ \n")
@@ -77,12 +78,12 @@ def _agenda_format(
         # f.write("\n")
         # f.write(f"【主な議事事項】 \n")
 
-        f.write(f"【会議の要約】 \n")
+        f.write(f"## 会議の要約 \n")
         list_formated_summary = _summary_format(texts=list_summary[-1])
         for i, doc in enumerate(list_formated_summary):
             f.write(doc)
         f.write("\n")
-        f.write(f"【会議の概要】 \n")
+        f.write(f"## 会議の概要 \n")
         text_summary = "".join(list_summary[:-1])
         list_formated_summary = _summary_format(texts=text_summary)
         for i, doc in enumerate(list_formated_summary):
@@ -90,10 +91,10 @@ def _agenda_format(
         f.write("\n")
         f.write("\n")
 
-        f.write(f"【会議の流れ】 \n")
+        f.write(f"## 会議の流れ \n")
         for text, speaker in list_transcript:
-            f.write("[" + speaker + "さん]" + " \n")
-            f.write(text + " \n")
+            f.write("- [" + speaker + "さん]" + " \n")
+            f.write("\n" + text + " \n")
 
 
 def _get_list_speaker(df: pd.DataFrame) -> list:
@@ -127,7 +128,7 @@ def _summary_format(texts: str):
     sents = texts.split("。")
     list_text = []
     for s in sents:
-        list_text.append(s + "\n")
+        list_text.append(s + "。" + "\n")
     return list_text
 
 
