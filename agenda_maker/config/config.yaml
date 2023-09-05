@@ -13,7 +13,7 @@ common:
 output:
   output_dir_base: result
   output_dir:
-  path_segmented_file: ${output.output_dir}/segnmented.csv
+  path_segmented_file: ${output.output_dir}/segmented.csv
   path_summarized_file: ${output.output_dir}/summarized.csv
   path_whisperx_file: ${output.output_dir}/whisperx.csv
   path_seg_word_file: ${output.output_dir}/seg_word.csv
