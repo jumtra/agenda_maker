@@ -1,4 +1,5 @@
 from logging import getLogger
+from typing import Literal
 
 from llama_cpp import Llama
 
@@ -34,8 +35,8 @@ class Elyza(BaseModel):
 
         logger.info("Setting Parameter")
 
-    def get_result(self, text):
+    def get_result(self, text: str, task: Literal["summarize", "punctuation", "default"]):
         self.build_model()
-        prompt = input_from_prompt(text=text)
+        prompt = input_from_prompt(text=text, task=task)
         output = self.model(prompt, **self.params)
         return output["choices"][0]["text"]

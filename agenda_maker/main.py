@@ -24,20 +24,23 @@ def make_agenda(
         config_dir=config_dir,
     )
 
-    logging.info(f"config_file = {config_path}")
-    logging.info("処理開始")
-    # preprocess
-    logging.info("入力データの変換前処理開始")
-    path_input = preprocess(path_input=path_input, config_manager=config_manager)
-    logging.info("入力データの変換前処理終了")
-
+    # 親パスの取得
     parent_path = Path(__file__).resolve().parent
+
+    logging.info(f"config_file = {config_path}")
+    logging.info("<処理開始>")
+    logging.info("文字起こし開始")
     # transcription
     if config_manager.config.tasks.is_transcript:
+        # preprocess
+        logging.info("入力データの変換前処理開始")
+        path_input = preprocess(path_input=path_input, config_manager=config_manager)
+        logging.info("入力データの変換前処理終了")
         script_run(
             script=str((parent_path / "agenda_logic/transcript.py").absolute()),
             cmd=["--input", path_input, "--output_name", output_name],
         )
+    logging.info("文字起こし終了")
     # segmentation
     logging.info("文章の段落分割開始")
     if config_manager.config.tasks.is_segmentate:
@@ -63,7 +66,7 @@ def make_agenda(
         cmd=["--output_name", output_name],
     )
     logging.info("議事録の生成終了")
-    logging.info("処理終了")
+    logging.info("<処理終了>")
 
 
 if __name__ == "__main__":
