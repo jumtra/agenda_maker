@@ -6,20 +6,44 @@ import pandas as pd
 from tqdm import tqdm
 
 from agenda_maker.common.config_manager import ConfigManager
+from agenda_maker.common.release_gpu_memory import release_gpu_memory
 from agenda_maker.model.summarization.elyza import Elyza
+
+
+def preprocess(text: str) -> str:
+    """ノイズ除去"""
+    text = re.sub(r"【.*】", "", text)
+    text = re.sub(r"（.*）", "", text)
+    text = re.sub(r"「.*」", "", text)
+    text = re.sub(r"[［］\[\]]", " ", text)  # ［］の除去
+    text = re.sub(r"[@＠]\w+", "", text)  # メンションの除去
+    text = re.sub(r"https?:\/\/.*?[\r\n ]", "", text)  # URLの除去
+    text = re.sub(r"　", " ", text)  # 全角空白の除去
+    text = text.replace("\u200b", "")
+    text = text.replace("/", "")
+    text = text.replace("-", "")
+    text = text.replace("\n", "")
+    return text
 
 
 def summarize(df_segmented: pd.DataFrame, config_manager: ConfigManager, key_text: str = "text") -> pd.DataFrame:
     list_text = df_segmented[key_text].to_list()
-    model = Elyza(config_manager=config_manager)
     list_result = []
     for text in tqdm(list_text, desc="Summarize"):
+        model = Elyza(config_manager=config_manager)
+        release_gpu_memory(model)
         _text = model.get_result(text)
         try:
-            list_result.append(re.split(r"要約:|要約結果:", _text)[-1])
+            _text = preprocess(_text)
+            list_result.append(_text)
         except:
             list_result.append(_text)
 
+    text_result = "".join(list_result)
+    model = Elyza(config_manager=config_manager)
+    release_gpu_memory(model)
+    _text = model.get_result(text_result)
+    list_result.append(_text)
     df = pd.DataFrame(list_result, columns=[key_text])
     return df
 

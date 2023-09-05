@@ -46,7 +46,7 @@ class SemanticTextSegmentation(BaseModel):
     def after_segmentation(self, list_text: list[str]) -> list[str]:
         th_max = self.max_segment_text
 
-        th_sim = 0.7
+        th_sim = 0.6
         list_result = self._get_sim_len(list_text)
 
         while True:

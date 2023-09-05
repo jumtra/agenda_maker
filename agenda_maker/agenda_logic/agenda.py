@@ -77,10 +77,15 @@ def _agenda_format(
         # f.write("\n")
         # f.write(f"【主な議事事項】 \n")
 
-        text_summary = "".join(list_summary)
-        f.write(f"【要約結果】 \n")
+        f.write(f"【会議の要約】 \n")
+        list_formated_summary = _summary_format(texts=list_summary[-1])
+        for i, doc in enumerate(list_formated_summary):
+            f.write(doc)
+        f.write("\n")
+        f.write(f"【会議の概要】 \n")
+        text_summary = "".join(list_summary[:-1])
         list_formated_summary = _summary_format(texts=text_summary)
-        for doc in list_formated_summary:
+        for i, doc in enumerate(list_formated_summary):
             f.write(doc)
         f.write("\n")
         f.write("\n")

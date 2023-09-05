@@ -34,7 +34,7 @@ model:
   # sementic segmentation のパラメータ
   segmentation:
     max_segment_text: 2000 # 1セグメントの最大文字数
-    min_segment_text: 400 # 1セグメントの最小文字数
+    min_segment_text: 300 # 1セグメントの最小文字数
     max_segment_num: 4 # 最大セグメント数
     min_segment_num: 4 # 最大セグメント数
     semantic_segmentation:
@@ -48,7 +48,7 @@ model:
 
   summarization:
     model_path: ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf
-    is_gpu_compile: False #llama.cppでcublasを使っているかどうか
+    is_gpu_compile: True #llama.cppでcublasを使っているかどうか
     n_ctx: 2048
     n_gpu_layers: 100
     params:

@@ -2,8 +2,10 @@ version: '2.2'
 services:
   apps:
     build:
-      context: .
+      context: ./
       dockerfile: Dockerfile
+      args:
+        - HF_TOKEN=${HF_TOKEN}
     tty: true
     image: agenda_maker:latest
     runtime: nvidia
