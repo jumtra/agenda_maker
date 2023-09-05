@@ -1,13 +1,15 @@
 FROM nvcr.io/nvidia/cuda:11.7.0-cudnn8-devel-ubuntu22.04
-
+ARG HF_TOKEN
 ENV PYTHONUNBUFFERED=1 
-
+ENV HF_TOKEN=$HF_TOKEN
 # SYSTEM
 RUN apt-get update --yes --quiet && DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
     software-properties-common \
     build-essential apt-utils \
     wget curl vim git ca-certificates kmod libssl-dev zlib1g-dev \
  && rm -rf /var/lib/apt/lists/*
+
+
 
 # PYTHON 3.10
 RUN add-apt-repository --yes ppa:deadsnakes/ppa && apt-get update --yes --quiet
@@ -35,12 +37,10 @@ RUN apt-get update && apt-get install -y language-pack-ja && \
 ENV LANGUAGE ja_JP:en
 ENV LC_ALL ja_JP.UTF-8
 ENV LANG ja_JP.UTF-8
-
 ENV TZ=Asia/Tokyo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 
-RUN python -m pip install --upgrade pip
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" keyboard-configuration\
     python3-pip \
@@ -49,18 +49,16 @@ RUN apt-get update && apt-get install -y -o Dpkg::Options::="--force-confdef" -o
     make \
     ffmpeg  \
     && apt-get -y clean all
-RUN python -m pip install poetry
+RUN python -m pip install --upgrade pip && python -m pip install poetry
 
-WORKDIR /home/
+# GET AGENDA MAKER
+# GET LLM
 RUN git clone https://github.com/jumtra/agenda_maker.git
-RUN cd agenda_maker
-RUN poetry install
+WORKDIR /agenda_maker/
+RUN poetry config installer.max-workers 10 && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi -vvv
+RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 python3 -m pip install llama-cpp-python==0.1.83 --no-cache-dir
+RUN python -c "from huggingface_hub._login import _login; _login(token='$HF_TOKEN', add_to_git_credential=False)"
+COPY ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf
 
-
-
-# for Tensorboard
+# for Gradio
 EXPOSE 6006
-# for Tensorboard
-EXPOSE 1234
-# for jupyterlab
-EXPOSE 8888

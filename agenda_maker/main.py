@@ -1,19 +1,17 @@
 from pathlib import Path
 
-from agenda_maker.agenda_logic.make_agenda_logic import format2agenda
-from agenda_maker.agenda_logic.segmentation import segmentation_logic
+from agenda_maker.agenda_logic.preprocess import preprocess
 from agenda_maker.common.config_manager import ConfigManager
 from agenda_maker.common.log_handler import add_log_handler
-from agenda_maker.data.io import any2wav
+from agenda_maker.common.script_run_kill import script_run
 
 
 def make_agenda(
-    path_input: str,
-    path_output: str = "./result",
-    config_path: str = "agenda_maker/config/config.yaml",
+    path_input: str = "data/sample.mp3", config_path: str = "agenda_maker/config/config.yaml", output_name: str = "test"
 ):
+    """GPU Memを完全にkillするためにscript_runでscriptを随時実行"""
     # loggerの設定
-    logging = add_log_handler(output_dir=path_output)
+    logging = add_log_handler(output_dir="./")
 
     if path_input is None:
         logging.error("-inまたは--input CLIで入力ファイルのパスを指定してください")
@@ -25,33 +23,50 @@ def make_agenda(
         config_yaml_path=config_yaml_path,
         config_dir=config_dir,
     )
-    Path(path_output).mkdir(parents=True, exist_ok=True)
+
+    # 親パスの取得
+    parent_path = Path(__file__).resolve().parent
 
     logging.info(f"config_file = {config_path}")
-    logging.info("処理開始")
-    # 入力データをwav形式に変換
-    logging.info("入力データの変換前処理開始")
-    path_wav_input = any2wav(path_input=path_input, path_out=path_output, config_manager=config_manager)
-    logging.info("入力データの変換前処理終了")
-
+    logging.info("<処理開始>")
+    logging.info("文字起こし開始")
+    # transcription
+    if config_manager.config.tasks.is_transcript:
+        # preprocess
+        logging.info("入力データの変換前処理開始")
+        path_input = preprocess(path_input=path_input, config_manager=config_manager)
+        logging.info("入力データの変換前処理終了")
+        script_run(
+            script=str((parent_path / "agenda_logic/transcript.py").absolute()),
+            cmd=["--input", path_input, "--output_name", output_name],
+        )
+    logging.info("文字起こし終了")
     # segmentation
     logging.info("文章の段落分割開始")
-    segmentation_logic(list_text=list_text, config_manager=config_manager)
+    if config_manager.config.tasks.is_segmentate:
+        script_run(
+            script=str((parent_path / "agenda_logic/segmentate.py").absolute()),
+            cmd=["--output_name", output_name],
+        )
     logging.info("文章の段落分割終了")
 
     # summarization
     logging.info("文章の要約開始")
+    if config_manager.config.tasks.is_summarize:
+        script_run(
+            script=str((parent_path / "agenda_logic/summarize.py").absolute()),
+            cmd=["--output_name", output_name],
+        )
     logging.info("文章の要約終了")
 
     # make agenda
     logging.info("議事録の生成開始")
-    format2agenda(
-        file_name=Path(path_output) / "agenda",
-        df_summary=df_translated,
-        df_transcript_with_annotate=df_transcript_with_speaker,
+    script_run(
+        script=str((parent_path / "agenda_logic/agenda.py").absolute()),
+        cmd=["--output_name", output_name],
     )
     logging.info("議事録の生成終了")
-    logging.info("処理終了")
+    logging.info("<処理終了>")
 
 
 if __name__ == "__main__":

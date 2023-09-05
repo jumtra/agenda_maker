@@ -3,6 +3,10 @@ from janome.tokenizer import Tokenizer
 
 
 def texttiling_japanese(text: str, w: int, k: int) -> list[str]:
+    return _texttiling_core(text, w, k)
+
+
+def _texttiling_core(text: str, w: int, k: int) -> list[str]:
     """
     text: 日本語の文章
     w: 窓の幅
