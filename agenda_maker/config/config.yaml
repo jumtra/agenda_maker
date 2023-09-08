@@ -55,8 +55,8 @@ model:
       temperature: 0.5
       top_p: 0.3
       top_k: 40
-      repeat_penalty: 1.1
-      max_tokens: 2042
+      repeat_penalty: 1.15
+      max_tokens: 2048
       stop:
         - "ASSISTANT:"
         - "USER:"

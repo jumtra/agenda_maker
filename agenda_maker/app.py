@@ -137,6 +137,8 @@ def main():
                 outputs=[outputbox, output_download, output_zip],
             )
     demo.launch(
+        enable_queue=True,
+        max_threads=30,
         auth=(user_id, password),
         show_error=True,
         server_port=6006,
