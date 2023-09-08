@@ -16,14 +16,14 @@ __all__ = ["SemanticTextSegmentation"]
 class SemanticTextSegmentation(BaseModel):
 
     """
-    texttilingで分割された文章を順にSentenceTransformerでベクトル化してcosine similarityを算出し
+    SentenceTransformerでベクトル化してcosine similarityを算出し
     類似度が閾値以上で文章を結合する。
     """
 
     def set_params(self) -> None:
         # parameter of  semantic segmentation
         self.threshold = self.config_manager.config.model.segmentation.semantic_segmentation.threshold
-        self.threshold_step = self.config_manager.config.model.segmentation.semantic_segmentation.threshold_step
+        self.th_segment_num = self.config_manager.config.model.segmentation.th_segment_num
         self.max_segment_text = self.config_manager.config.model.segmentation.max_segment_text
         self.min_segment_text = self.config_manager.config.model.segmentation.min_segment_text
         self.model_type = self.config_manager.config.model.segmentation.semantic_segmentation.model_type
@@ -34,10 +34,9 @@ class SemanticTextSegmentation(BaseModel):
 
     def get_result(self, list_text: list[str]) -> list:
         self.build_model()
-        self.max_segment_text = self._get_max_segment_text(list_text=list_text)
-        semantic_segmentation = self._semantic_segmentation(list_text, self.threshold)
-        semantic_segmentation = self.after_segmentation(semantic_segmentation)
-        semantic_segmentation = self.merge_min_text(semantic_segmentation)
+        semantic_segmentation = self.semantic_segmentation(list_text)
+        if len(list_text) >= self.th_segment_num:
+            semantic_segmentation = self.merge_min_text(semantic_segmentation)
         release_gpu_memory(gpu_task=self.model)
         return semantic_segmentation
 
@@ -45,13 +44,15 @@ class SemanticTextSegmentation(BaseModel):
     def load_sentence_transformer(self) -> None:
         self.model = SentenceTransformer(self.model_type)
 
-    def after_segmentation(self, list_text: list[str]) -> list[str]:
+    def semantic_segmentation(self, list_text: list[str]) -> list[str]:
         th_max = self.max_segment_text
 
-        th_sim = 0.6
+        th_sim = self.threshold
         list_result = self._get_sim_len(list_text)
 
         while True:
+            if len(list_text) <= self.th_segment_num:
+                break
             is_continue = any([(value[0] >= th_sim and value[1] <= th_max) for value in list_result])
 
             if is_continue:
@@ -70,17 +71,11 @@ class SemanticTextSegmentation(BaseModel):
         Args:
         list_text (list): 結合する文字列が格納されたリスト。
         th_min (int): チャンクとして結合するための最小文字数。
-        th_max (int): チャンクとして結合するための最大文字数。
+        th_max (int): チャンクとして結合後の最大文字数。
 
         Returns:
         list: 結合されたチャンクを格納したリスト。
 
-        与えられた文字列リストを、指定された条件に基づいて結合し、th_max以下の文字数で分割します。
-        結果のチャンクはリストとして返されます。リスト内の順序は変更されません。
-
-        制約１：結合されたチャンクはth_max以下の文字数になります。
-        制約２：文字列リストの順序は変更されません。
-        制約３：結合された文字列の長さと元の文字列リストの長さは同じになります。
         """
         th_max = self.max_segment_text
         th_min = self.min_segment_text
@@ -101,51 +96,6 @@ class SemanticTextSegmentation(BaseModel):
             merged_text.append(current_chunk)
 
         return merged_text
-
-    def _semantic_segmentation(self, segments: list[str], threshold: float) -> list:
-        new_segments = []
-        is_over = True
-
-        while is_over:
-            dict_result = self._semantic_segmentation_core(segments=segments, threshold=threshold)
-            list_index = dict_result["list_index"]
-            list_sim = dict_result["list_sim"]
-            for index_i in list_index:
-                seg = " ".join([segments[i] for i in index_i])
-                new_segments.append(seg)
-                if len(seg) > self.max_segment_text:
-                    if threshold > 1.0:
-                        is_over = False
-                    else:
-                        is_over = True
-                        new_segments = []
-                        break
-                else:
-                    is_over = False
-            threshold += self.threshold_step
-
-        return new_segments
-
-    def _semantic_segmentation_core(self, segments: list[str], threshold: float) -> dict:
-        segment_map = [0]
-        list_sim = [0.0]
-        for index, (text1, text2) in enumerate(zip(segments[:-1], segments[1:])):
-            sim = self._get_similarity(text1, text2)
-            list_sim.append(sim)
-            if sim >= threshold:
-                segment_map.append(0)
-            else:
-                segment_map.append(1)
-        list_index = self._index_mapping(segment_map)
-        return {"list_index": list_index, "list_sim": list_sim}
-
-    def _get_max_segment_text(self, list_text: list) -> int:
-        len_text = len(reduce(lambda a, b: a + b, list_text))
-        len_seg_text = int(len_text / self.config_manager.config.model.segmentation.max_segment_num)
-        if self.max_segment_text > len_seg_text:
-            return max(len_seg_text - 500, int(self.max_segment_text / 2) + 1000)
-        else:
-            return self.max_segment_text
 
     def _get_sim_len(self, list_text: list[str]) -> list[list[float, float]]:
         list_result = []
@@ -205,26 +155,13 @@ class SemanticTextSegmentation(BaseModel):
         combined_text.append(current_text)
         return combined_text
 
-    def _index_mapping(self, segment_map) -> list[list[int]]:
-        """分割された文のインデックスをリストでまとめる"""
-        index_list = []
-        temp = []
-        for index, i in enumerate(segment_map):
-            if i == 1:
-                index_list.append(temp)
-                temp = [index]
-            else:
-                temp.append(index)
-        index_list.append(temp)
-        return index_list
-
     def _get_similarity(self, text1: str, text2: str) -> float:
         """テキスト1とテキスト2の文書ベクトルのコサイン類似度を計算"""
         embeding_1 = self.model.encode(text1).reshape(1, -1)
         embeding_2 = self.model.encode(text2).reshape(1, -1)
 
         if np.any(np.isnan(embeding_1)) or np.any(np.isnan(embeding_2)):
-            return 1
+            return 0
 
         sim = cosine_similarity(embeding_1, embeding_2)
         return sim

@@ -18,7 +18,6 @@ def segmentation(df_whisperx: pd.DataFrame, config_manager: ConfigManager, key_t
     list_text: list[str] = df_whisperx[key_text].to_list()
 
     max_segmented_text = config_manager.config.model.segmentation.max_segment_text
-    min_segmented_text = config_manager.config.model.segmentation.min_segment_text
 
     if len(reduce(lambda a, b: a + b, list_text)) > max_segmented_text:
         # NOTE texttilingない方がいい感じに分割できる

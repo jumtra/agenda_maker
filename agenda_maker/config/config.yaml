@@ -25,7 +25,7 @@ preprocess:
     start_time: 0 # 音声データの初めてn秒カット
     end_time: 5 # 音声データの終わりn秒カット
   silence_cut:
-    min_silence_len: 500 #n秒以上無音なら分割
+    min_silence_len: 300 #n秒以上無音なら分割
     silence_thresh: -60 #ndBFS以下で無音と判定
     keep_silence: 50 #分割後Nmsは無音を残す
   
@@ -34,13 +34,11 @@ model:
   # sementic segmentation のパラメータ
   segmentation:
     max_segment_text: 1900 # 1セグメントの最大文字数
-    min_segment_text: 300 # 1セグメントの最小文字数
-    max_segment_num: 4 # 最大セグメント数
-    min_segment_num: 4 # 最大セグメント数
+    min_segment_text: 100 # 1セグメントの最小文字数
+    th_segment_num: 4 # segmentationを止める閾値セグメント数
     semantic_segmentation:
       model_type: "pkshatech/GLuCoSE-base-ja" # SentenceTransformerのモデルタイプ
-      threshold_step: 0.01 # 
-      threshold: 0.5
+      threshold: 0.6
     # text tillingのパラメータ
     texttiling:
       w: 10 #Pseudosentence size
