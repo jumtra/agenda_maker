@@ -2,10 +2,9 @@
 .venv
 .mypy_cache
 /result/*
-/sample_data/*
 /model_dir/*
-*.db
 data/*
+*.db
 *.out
 __pycache__
 *.ipynb

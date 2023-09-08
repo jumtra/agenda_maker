@@ -5,7 +5,7 @@ from agenda_maker.common import ConfigManager, add_log_handler, script_run
 
 
 def make_agenda(
-    path_input: str = "data/sample.mp3", config_path: str = "agenda_maker/config/config.yaml", output_name: str = "test"
+    path_input: str = "sample_data/sample.mp4", config_path: str = "agenda_maker/config/config.yaml", output_name: str = "test"
 ):
     """GPU Memを完全にkillするためにscript_runでscriptを随時実行"""
     # loggerの設定
@@ -36,7 +36,7 @@ def make_agenda(
         logging.info("入力データの変換前処理終了")
         script_run(
             script=str((parent_path / "agenda_logic/transcript.py").absolute()),
-            cmd=["--input", path_input, "--output_name", output_name],
+            cmd=["--config_path", config_path, "--input", path_input, "--output_name", output_name],
         )
     logging.info("文字起こし終了")
     # segmentation
@@ -44,7 +44,7 @@ def make_agenda(
     if config_manager.config.tasks.is_segmentate:
         script_run(
             script=str((parent_path / "agenda_logic/segmentate.py").absolute()),
-            cmd=["--output_name", output_name],
+            cmd=["--config_path", config_path, "--output_name", output_name],
         )
     logging.info("文章の段落分割終了")
 
@@ -53,7 +53,7 @@ def make_agenda(
     if config_manager.config.tasks.is_summarize:
         script_run(
             script=str((parent_path / "agenda_logic/summarize.py").absolute()),
-            cmd=["--output_name", output_name],
+            cmd=["--config_path", config_path, "--output_name", output_name],
         )
     logging.info("文章の要約終了")
 
@@ -61,7 +61,7 @@ def make_agenda(
     logging.info("議事録の生成開始")
     script_run(
         script=str((parent_path / "agenda_logic/agenda.py").absolute()),
-        cmd=["--output_name", output_name],
+        cmd=["--config_path", config_path, "--output_name", output_name],
     )
     logging.info("議事録の生成終了")
     logging.info("<処理終了>")
