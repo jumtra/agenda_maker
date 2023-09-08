@@ -53,12 +53,12 @@ RUN python -m pip install --upgrade pip && python -m pip install poetry
 
 # GET AGENDA MAKER
 # GET LLM
+WORKDIR /home/
 RUN git clone https://github.com/jumtra/agenda_maker.git
-WORKDIR /agenda_maker/
+WORKDIR /home/agenda_maker/
 RUN poetry config installer.max-workers 10 && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi -vvv
 RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 python3 -m pip install llama-cpp-python==0.1.83 --no-cache-dir
 RUN python -c "from huggingface_hub._login import _login; _login(token='$HF_TOKEN', add_to_git_credential=False)"
 COPY ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf ELYZA-japanese-Llama-2-7b-fast-instruct-q4_0.gguf
-
 # for Gradio
 EXPOSE 6006
