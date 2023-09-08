@@ -72,9 +72,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-pass", "--password", default="password", type=str)
     parser.add_argument("-id", "--user_id", default="user", type=str)
+    parser.add_argument("-share", "--share", default=True, type=str)
+    parser.add_argument("-inl", "--inline", default=False, type=str)
     args = parser.parse_args()
     user_id = args.user_id
     password = args.password
+    share = args.share
+    inline = args.inline
 
     with gr.Blocks(title="議事録AI") as demo:
         gr.Markdown("# 議事録作成AI")
@@ -138,11 +142,12 @@ def main():
             )
     demo.launch(
         enable_queue=True,
+        inline=inline,
         max_threads=30,
         auth=(user_id, password),
         show_error=True,
         server_port=6006,
-        share=True,
+        share=share,
     )
 
 
