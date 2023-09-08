@@ -1,6 +1,8 @@
 import numpy as np
 from janome.tokenizer import Tokenizer
 
+__all__ = ["texttiling_japanese"]
+
 
 def texttiling_japanese(text: str, w: int, k: int) -> list[str]:
     return _texttiling_core(text, w, k)

@@ -10,6 +10,8 @@ from agenda_maker.model.base_model import BaseModel
 
 logger = getLogger(__name__)
 
+__all__ = ["SemanticTextSegmentation"]
+
 
 class SemanticTextSegmentation(BaseModel):
 

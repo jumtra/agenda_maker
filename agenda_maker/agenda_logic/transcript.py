@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 from agenda_maker.common.config_manager import ConfigManager
-from agenda_maker.model.transcription.whisperx import WhisperX
+from agenda_maker.model.transcription import WhisperX
 
 
 def main():

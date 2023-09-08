@@ -5,9 +5,8 @@ from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
 
-from agenda_maker.common.config_manager import ConfigManager
-from agenda_maker.common.release_gpu_memory import release_gpu_memory
-from agenda_maker.model.summarization.elyza import Elyza
+from agenda_maker.common import ConfigManager, release_gpu_memory
+from agenda_maker.model.summarization import Elyza
 
 
 def preprocess(text: str) -> str:
@@ -15,6 +14,8 @@ def preprocess(text: str) -> str:
     text = re.sub(r"【.*】", "", text)
     text = re.sub(r"（.*）", "", text)
     text = re.sub(r"「.*」", "", text)
+    text = re.sub(r"<.*>", "", text)
+    text = re.sub(r"＜.*＞", "", text)
     text = re.sub(r"[［］\[\]]", " ", text)  # ［］の除去
     text = re.sub(r"[@＠]\w+", "", text)  # メンションの除去
     text = re.sub(r"https?:\/\/.*?[\r\n ]", "", text)  # URLの除去

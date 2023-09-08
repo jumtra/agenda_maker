@@ -4,6 +4,9 @@ import subprocess
 logger = logging.getLogger()
 
 
+__all__ = ["script_run"]
+
+
 def script_run(script: str, cmd: list[str]):
     try:
         # スクリプトを実行し、実行したプロセスオブジェクトを取得

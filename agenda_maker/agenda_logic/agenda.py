@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from agenda_maker.common.config_manager import ConfigManager
+from agenda_maker.common import ConfigManager
 
 
 def main():

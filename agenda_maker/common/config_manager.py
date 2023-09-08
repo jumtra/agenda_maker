@@ -6,6 +6,8 @@ from typing import Any, Union
 
 from omegaconf import DictConfig, OmegaConf
 
+__all__ = ["ConfigManager"]
+
 
 @dataclass(frozen=True)
 class ConfigManager:
@@ -16,9 +18,7 @@ class ConfigManager:
     config_dir: str
 
     @classmethod
-    def from_yaml(
-        cls, config_dir: str, config_yaml_path: str, enable_merge_cli_args: bool = False
-    ) -> ConfigManager:
+    def from_yaml(cls, config_dir: str, config_yaml_path: str, enable_merge_cli_args: bool = False) -> ConfigManager:
         """yamlファイルの読み込み
         enable_merge_cli_args: CLI引数からconfigを受け取る場合使用
         """

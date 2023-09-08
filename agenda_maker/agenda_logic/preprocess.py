@@ -5,7 +5,7 @@ import ffmpeg
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
 
-from agenda_maker.common.config_manager import ConfigManager
+from agenda_maker.common import ConfigManager
 
 logger = logging.getLogger()
 

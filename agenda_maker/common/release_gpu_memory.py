@@ -5,6 +5,8 @@ import torch
 
 logger = getLogger()
 
+__all__ = ["release_gpu_memory"]
+
 
 def release_gpu_memory(gpu_task) -> None:
     """不要なGPUメモリーを解放"""

@@ -1,9 +1,7 @@
 from pathlib import Path
 
 from agenda_maker.agenda_logic.preprocess import preprocess
-from agenda_maker.common.config_manager import ConfigManager
-from agenda_maker.common.log_handler import add_log_handler
-from agenda_maker.common.script_run_kill import script_run
+from agenda_maker.common import ConfigManager, add_log_handler, script_run
 
 
 def make_agenda(

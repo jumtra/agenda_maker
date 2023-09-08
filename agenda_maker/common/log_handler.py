@@ -1,6 +1,8 @@
 from logging import FileHandler, Formatter, StreamHandler, getLogger
 from pathlib import Path
 
+__all__ = ["add_log_handler"]
+
 
 def add_log_handler(output_dir):
     """
@@ -12,9 +14,7 @@ def add_log_handler(output_dir):
     ----------
     output_dir : ログファイルを配置するディレクトリ
     """
-    verbose_fmt = Formatter(
-        "%(asctime)s %(levelname)-6s %(name)s %(lineno)d [%(funcName)s] %(message)s"
-    )
+    verbose_fmt = Formatter("%(asctime)s %(levelname)-6s %(name)s %(lineno)d [%(funcName)s] %(message)s")
 
     # 同じloggerを参照してしまうため、loggerの名前にdateを追記するために必要。
     # https://docs.python.org/ja/3/howto/logging-cookbook.html#logging-to-a-single-file-from-multiple-processes

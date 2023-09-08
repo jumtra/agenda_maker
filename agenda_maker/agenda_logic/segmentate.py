@@ -4,9 +4,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from agenda_maker.common.config_manager import ConfigManager
-from agenda_maker.model.segmentation.semantic_segmentation import SemanticTextSegmentation
-from agenda_maker.model.segmentation.text_tiling import texttiling_japanese
+from agenda_maker.common import ConfigManager
+from agenda_maker.model.segmentation import SemanticTextSegmentation, texttiling_japanese
 
 logger = logging.getLogger()
 
