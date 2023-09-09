@@ -136,18 +136,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-pass", "--password", default="password", type=str)
     parser.add_argument("-id", "--user_id", default="user", type=str)
-    parser.add_argument("-share", "--share", default=True, type=bool)
-    parser.add_argument("-inl", "--inline", default=False, type=bool)
-    parser.add_argument("-auth", "--is_auth", default=True, type=bool)
-    parser.add_argument("-queue", "--enable_queue", default=True, type=bool)
-    parser.add_argument("-port", "--port", default=6006, type=str)
+    parser.add_argument("-share", "--share", default="True", type=str)
+    parser.add_argument("-inl", "--inline", default="False", type=str)
+    parser.add_argument("-auth", "--is_auth", default="True", type=str)
+    parser.add_argument("-queue", "--enable_queue", default="True", type=str)
+    parser.add_argument("-port", "--port", default=None, type=int)
     args = parser.parse_args()
     user_id = args.user_id
     password = args.password
-    share = args.share
-    inline = args.inline
-    is_auth = args.is_auth
-    enable_queue = args.enable_queue
+    share = args.share == "True"
+    inline = args.inline == "True"
+    is_auth = args.is_auth == "True"
+    enable_queue = args.enable_queue == "True"
     port = args.port
     demo = app()
     demo.launch(
@@ -156,7 +156,7 @@ def main():
         max_threads=30,
         auth=(user_id, password) if is_auth else None,
         show_error=True,
-        server_port=int(port),
+        server_port=port,
         share=share,
     )
 
