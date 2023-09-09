@@ -74,11 +74,13 @@ def main():
     parser.add_argument("-id", "--user_id", default="user", type=str)
     parser.add_argument("-share", "--share", default=True, type=str)
     parser.add_argument("-inl", "--inline", default=False, type=str)
+    parser.add_argument("-auth", "--is_auth", default=True, type=str)
     args = parser.parse_args()
     user_id = args.user_id
     password = args.password
     share = args.share
     inline = args.inline
+    is_auth = args.is_auth
 
     with gr.Blocks(title="議事録AI") as demo:
         gr.Markdown("# 議事録作成AI")
@@ -144,7 +146,7 @@ def main():
         enable_queue=True,
         inline=inline,
         max_threads=30,
-        auth=(user_id, password),
+        auth=(user_id, password) if is_auth else None,
         show_error=True,
         server_port=6006,
         share=share,
