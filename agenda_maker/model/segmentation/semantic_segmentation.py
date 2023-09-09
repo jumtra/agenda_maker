@@ -34,6 +34,7 @@ class SemanticTextSegmentation(BaseModel):
 
     def get_result(self, list_text: list[str]) -> list:
         self.build_model()
+        semantic_segmentation = self._semantic_segmentation(list_text, threshold=self.threshold)
         semantic_segmentation = self.semantic_segmentation(list_text)
         if len(list_text) >= self.th_segment_num:
             semantic_segmentation = self.merge_min_text(semantic_segmentation)
@@ -46,8 +47,8 @@ class SemanticTextSegmentation(BaseModel):
 
     def semantic_segmentation(self, list_text: list[str]) -> list[str]:
         th_max = self.max_segment_text
-
         th_sim = self.threshold
+
         list_result = self._get_sim_len(list_text)
 
         while True:
@@ -165,3 +166,53 @@ class SemanticTextSegmentation(BaseModel):
 
         sim = cosine_similarity(embeding_1, embeding_2)
         return sim
+
+    def _semantic_segmentation(self, segments: list[str], threshold: float) -> list:
+        new_segments = []
+        is_over = True
+
+        while is_over:
+            dict_result = self._semantic_segmentation_core(segments=segments, threshold=threshold)
+            list_index = dict_result["list_index"]
+            list_sim = dict_result["list_sim"]
+            for index_i in list_index:
+                seg = " ".join([segments[i] for i in index_i])
+                new_segments.append(seg)
+                if len(seg) > self.max_segment_text:
+                    if threshold > 1.0:
+                        is_over = False
+                    else:
+                        is_over = True
+                        new_segments = []
+                        break
+                else:
+                    is_over = False
+            threshold += 0.01
+
+        return new_segments
+
+    def _index_mapping(self, segment_map) -> list[int]:
+        """分割された文のインデックスをリストでまとめる"""
+        index_list = []
+        temp = []
+        for index, i in enumerate(segment_map):
+            if i == 1:
+                index_list.append(temp)
+                temp = [index]
+            else:
+                temp.append(index)
+        index_list.append(temp)
+        return index_list
+
+    def _semantic_segmentation_core(self, segments: list[str], threshold: float) -> dict:
+        segment_map = [0]
+        list_sim = [0.0]
+        for index, (text1, text2) in enumerate(zip(segments[:-1], segments[1:])):
+            sim = self._get_similarity(text1, text2)
+            list_sim.append(sim[0][0])
+            if sim >= threshold:
+                segment_map.append(0)
+            else:
+                segment_map.append(1)
+        list_index = self._index_mapping(segment_map)
+        return {"list_index": list_index, "list_sim": list_sim}
