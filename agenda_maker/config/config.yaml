@@ -1,8 +1,8 @@
 
 # 実行するタスク設定
 tasks:
-  is_wav_preprocess: True
-  is_transcript: True
+  is_wav_preprocess: False
+  is_transcript: False
   is_segmentate: True
   is_summarize: True
 
@@ -23,7 +23,7 @@ output:
 preprocess:
   cut_time:
     start_time: 0 # 音声データの初めてn秒カット
-    end_time: 5 # 音声データの終わりn秒カット
+    end_time: 0 # 音声データの終わりn秒カット
   silence_cut:
     min_silence_len: 300 #n秒以上無音なら分割
     silence_thresh: -60 #ndBFS以下で無音と判定
@@ -34,7 +34,7 @@ model:
   # sementic segmentation のパラメータ
   segmentation:
     max_segment_text: 1900 # 1セグメントの最大文字数
-    min_segment_text: 100 # 1セグメントの最小文字数
+    min_segment_text: 300 # 1セグメントの最小文字数
     th_segment_num: 4 # segmentationを止める閾値セグメント数
     semantic_segmentation:
       model_type: "pkshatech/GLuCoSE-base-ja" # SentenceTransformerのモデルタイプ
@@ -53,7 +53,7 @@ model:
       temperature: 0.5
       top_p: 0.3
       top_k: 40
-      repeat_penalty: 1.15
+      repeat_penalty: 1.1
       max_tokens: 2048
       stop:
         - "ASSISTANT:"
