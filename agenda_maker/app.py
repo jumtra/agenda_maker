@@ -68,7 +68,7 @@ def generate_agenda(
     return markdown, path_agenda, path_zip
 
 
-def app(share: bool, inline: bool, is_auth: bool, enable_queue: bool, password: str | None = None, user_id: str | None = None):
+def app():
     with gr.Blocks(title="議事録AI") as demo:
         gr.Markdown("# 議事録作成AI")
 
@@ -129,25 +129,18 @@ def app(share: bool, inline: bool, is_auth: bool, enable_queue: bool, password: 
                 ],
                 outputs=[outputbox, output_download, output_zip],
             )
-    demo.launch(
-        enable_queue=enable_queue,
-        inline=inline,
-        max_threads=30,
-        auth=(user_id, password) if is_auth else None,
-        show_error=True,
-        server_port=6006,
-        share=share,
-    )
+    return demo
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-pass", "--password", default="password", type=str)
     parser.add_argument("-id", "--user_id", default="user", type=str)
-    parser.add_argument("-share", "--share", default=True, type=str)
-    parser.add_argument("-inl", "--inline", default=False, type=str)
-    parser.add_argument("-auth", "--is_auth", default=True, type=str)
-    parser.add_argument("-queue", "--enable_queue", default=True, type=str)
+    parser.add_argument("-share", "--share", default=True, type=bool)
+    parser.add_argument("-inl", "--inline", default=False, type=bool)
+    parser.add_argument("-auth", "--is_auth", default=True, type=bool)
+    parser.add_argument("-queue", "--enable_queue", default=True, type=bool)
+    parser.add_argument("-port", "--port", default=6006, type=str)
     args = parser.parse_args()
     user_id = args.user_id
     password = args.password
@@ -155,7 +148,17 @@ def main():
     inline = args.inline
     is_auth = args.is_auth
     enable_queue = args.enable_queue
-    app(share=share, inline=inline, is_auth=is_auth, enable_queue=enable_queue, password=password, user_id=user_id)
+    port = args.port
+    demo = app()
+    demo.launch(
+        enable_queue=enable_queue,
+        inline=inline,
+        max_threads=30,
+        auth=(user_id, password) if is_auth else None,
+        show_error=True,
+        server_port=int(port),
+        share=share,
+    )
 
 
 if __name__ == "__main__":
