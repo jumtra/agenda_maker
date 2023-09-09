@@ -32,18 +32,11 @@ def summarize(df_segmented: pd.DataFrame, config_manager: ConfigManager, key_tex
     list_result = []
     for text in tqdm(list_text, desc="Summarize"):
         if len(text) <= config_manager.config.model.segmentation.min_segment_text:
-            list_result.append(text)
             continue
         # Summarize
         model = Elyza(config_manager=config_manager)
         release_gpu_memory(model)
         _text = model.get_result(text, task="summarize")
-        _text = preprocess(_text)
-
-        # Punctuate
-        model = Elyza(config_manager=config_manager)
-        release_gpu_memory(model)
-        _text = model.get_result(text, task="punctuation")
         _text = preprocess(_text)
 
         list_result.append(_text)
@@ -52,11 +45,6 @@ def summarize(df_segmented: pd.DataFrame, config_manager: ConfigManager, key_tex
     model = Elyza(config_manager=config_manager)
     release_gpu_memory(model)
     _text = model.get_result(text_result, task="summarize")
-    _text = preprocess(_text)
-    # Punctuate
-    model = Elyza(config_manager=config_manager)
-    release_gpu_memory(model)
-    _text = model.get_result(text, task="punctuation")
     _text = preprocess(_text)
     list_result.append(_text)
     df = pd.DataFrame(list_result, columns=[key_text])
