@@ -113,7 +113,7 @@ def app():
 
             ## 説明書
             with gr.TabItem("README"):
-                gr.Markdown(read_markdown(str(Path(__file__).resolve().parents[1] / "README.md")))
+                gr.Markdown(read_markdown(str(Path(__file__).resolve().parents[1] / "doc/app.md")))
 
             # Action
             submit_btn.click(
