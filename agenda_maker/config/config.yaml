@@ -1,8 +1,8 @@
 
 # 実行するタスク設定
 tasks:
-  is_wav_preprocess: False
-  is_transcript: False
+  is_wav_preprocess: True
+  is_transcript: True
   is_segmentate: True
   is_summarize: True
 
