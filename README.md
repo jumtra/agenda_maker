@@ -1,4 +1,5 @@
 # 議事録生成AI
+![agenda_ai.png](doc/img/agenda_ai.drawio.png)
 
 動画や音声データを入力として、文字起こし、話者割り当てと要約の結果を出力します。
 
@@ -7,9 +8,9 @@
 
 ## 特徴
 
-* 文字起こし：Whisperと呼ばれる音声認識技術を使用して、音声データからテキストへの変換を行います。
-* 話者割り当て：Pyannoteというライブラリを使用して、音声データから話者を自動的に分離します。
-* テキストセグメンテーション：TextTillingやSentenceTransformerを使用して、テキストを段落に分割します。
+* 文字起こし：WhisperXを使用して、音声データからテキストへの変換を行います。
+* 話者割り当て：WhisperXを使用して、音声データから話者を自動的に分離します。
+* テキストセグメンテーション：SentenceTransformerを使用して、テキストを段落に分割します。
 * 要約：LLama2 ELYZAを使用して、生成されたテキストを要約します。
 * 文書校正：LLama2 ELYZAを使用して、生成されたテキストを文章校正します。
 
@@ -29,8 +30,9 @@
 - GPU: GEFORCE RTX2070 SUPER(8GB)
 - MEMORY: 32GB
 
-## 環境構築
 
+※上記実行環境で、約37分のmp3ファイルから議事録を生成するのにかかる時間は**約7分**
+## 環境構築
 
 ### Dockerを使う場合
 make, dockerが必要です。
@@ -111,6 +113,10 @@ poetry install --no-interaction --no-ansi -vvv
   ```
 ## 実行方法
 
+実行方法は、CLIで実行する方法とgradioを起動する方法の2つあります。
+
+### CLIで実行する方法
+
 以下のコマンドで実行可能
 
 ```
@@ -125,66 +131,47 @@ options:
   -input INPUT_PATH, --input_path INPUT_PATH(mp3 or mp4 or wav)
   -output OUTPUT_NAME, --output_name OUTPUT_NAME
 ```
-## コンフィグの設定
+※config.yamlの各項目は`doc/config.md`をご参照ください。
 
-| パラメータ                           | 説明                                                                                                  |
-|----------------------------------|-------------------------------------------------------------------------------------------------------|
-| **tasks**                         | 実行するタスク設定                                                                                      |
-| is_wav_preprocess                | True: WAV前処理を実行する、False: 実行しない                                                       |
-| is_transcript                    | True: テキスト変換を実行する、False: 実行しない                                                      |
-| is_segmentate                    | True: セグメンテーションを実行する、False: 実行しない                                                 |
-| is_summarize                     | True: 要約を実行する、False: 実行しない                                                              |
-| **common**                        | 共通部分のパラメータ                                                                                     |
-| seed                             | 乱数生成のシード値                                                                                     |
-| **output**                        | 出力設定                                                                                              |
-| output_dir_base                  | ベースの出力ディレクトリ名                                                                               |
-| output_dir                       | 出力ディレクトリの詳細な設定（以下のファイルの出力ディレクトリを指定）                                    |
-| path_segmented_file              | セグメンテーション結果のCSVファイルの出力パス                                                         |
-| path_summarized_file             | 要約結果のCSVファイルの出力パス                                                                       |
-| path_whisperx_file               | Whisperx結果のCSVファイルの出力パス                                                                   |
-| path_seg_word_file               | セグメンテーションされた単語のCSVファイルの出力パス                                                    |
-| path_agenda_file                 | アジェンダファイルの出力パス                                                                           |
-| **preprocess**                    | プリプロセス設定                                                                                       |
-| cut_time                         | 音声データのカット設定                                                                                 |
-| start_time                       | 音声データの初めてn秒をカット                                                                         |
-| end_time                         | 音声データの終わりn秒をカット                                                                         |
-| silence_cut                      | 無音のカット設定                                                                                      |
-| min_silence_len                  | n秒以上無音なら分割                                                                                   |
-| silence_thresh                   | ndBFS以下で無音と判定                                                                                  |
-| keep_silence                     | 分割後Nmsは無音を残す                                                                                 |
-| **model**                         | モデル設定                                                                                             |
-| **segmentation**                  | 文章分割のパラメータ                                                                                    |
-| max_segment_text                 | 1セグメントの最大文字数                                                                               |
-| min_segment_text                 | 1セグメントの最小文字数                                                                               |
-| th_segment_num                  | 最大セグメント数                                                                                       |
-| semantic_segmentation            | セマンティックセグメンテーションの設定                                                                |
-| model_type                       | SentenceTransformerのモデルタイプ                                                                       |
-| threshold                        | 閾値設定                                                                                              |
-| texttiling                       | テキストティリングのパラメータ                                                                         |
-| w                                | 擬似文のサイズ                                                                                         |
-| k                                | ブロック比較法で使用されるブロックのサイズ                                                             |
-| summarization                    | 要約のパラメータ                                                                                        |
-| model_path                       | 要約モデルのパス                                                                                        |
-| is_gpu_compile                   | llama.cppでcublasを使用するかどうかの設定                                                              |
-| n_ctx                            | コンテキストサイズ                                                                                     |
-| n_gpu_layers                     | GPUレイヤー数                                                                                          |
-| params                           | 要約のパラメータ                                                                                        |
-| temperature                      | 温度設定                                                                                              |
-| top_p                            | Top-pサンプリングの閾値設定                                                                           |
-| top_k                            | Top-kサンプリングの閾値設定                                                                           |
-| repeat_penalty                   | リピートのペナルティ設定                                                                               |
-| max_tokens                       | 最大トークン数                                                                                         |
-| stop                             | 停止ワードの設定                                                                                       |
-| whisperx                         | Whisperx設定                                                                                          |
-| whisper                          | 文字起こしのパラメータ                                                                                  |
-| model_type                       | Whisperモデルのタイプ                                                                                  |
-| compute_type                     | 計算タイプ（float16など）                                                                              |
-| batch_size                       | バッチサイズ                                                                                            |
-| diarization                      | 話者分離のパラメータ                                                                                   |
-| min_speakers                     | 発話している最小人数                                                                                   |
-| max_speakers                     | 発話している最大人数                                                                                   |
+
+### gradioを起動する方法
+
+以下のコマンドでgradioを起動
+
+```
+python agenda_maker/app.py --share False --is_auth False
+```
+引数は以下のものを使用可能
+以下の引数は、gradioのlunchで使用する引数を参照にしてください。
+
+```
+options:
+  -h, --help            show this help message and exit
+  -pass PASSWORD, --password PASSWORD
+  -id USER_ID, --user_id USER_ID
+  -share SHARE, --share SHARE
+  -inl INLINE, --inline INLINE
+  -auth IS_AUTH, --is_auth IS_AUTH
+  -queue ENABLE_QUEUE, --enable_queue ENABLE_QUEUE
+  -port PORT, --port PORT
+```
+
+ローカルホストでアクセスすると以下の画面が出てくる。
+
+![gradio.png](doc/img/gradio.png)
+
+
+## 使用モデル
+
+| モデル | リンク | 商標利用 | ライセンス |
+| --- | --- | --- | --- |
+|whisper X| https://github.com/m-bain/whisperX/tree/main | 可 |BSD 4-Clause "Original" or "Old" License|
+| pkshatech/simcse-ja-bert-base-clcmlp | https://huggingface.co/pkshatech/GLuCoSE-base-ja | 可 | apach2.0|
+| ELYZA-Llama 2 7B GGUF | https://huggingface.co/mmnga/ELYZA-japanese-Llama-2-7b-fast-instruct-gguf | 可 |　llama 2 |
+## 免責事項
+
+この製品は、Max Bain によって開発されたソフトウェアを含んでいます。
 
 ## 作成者
 
 * jumtras
-
