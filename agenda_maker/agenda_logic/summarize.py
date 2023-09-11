@@ -11,11 +11,7 @@ from agenda_maker.model.summarization import Elyza
 
 def preprocess(text: str) -> str:
     """ノイズ除去"""
-<<<<<<< HEAD
     if "要約:" in text:
-=======
-    if "要約:"in text:
->>>>>>> 626aabce1ac210653d0884f00d8b75199eae61b8
         text = text.split("要約:")[-1]
     text = re.sub(r"【.*】", "", text)
     text = re.sub(r"（.*）", "", text)
