@@ -11,6 +11,8 @@ from agenda_maker.model.summarization import Elyza
 
 def preprocess(text: str) -> str:
     """ノイズ除去"""
+    if "要約:" in text:
+        text = text.split("要約:")[-1]
     text = re.sub(r"【.*】", "", text)
     text = re.sub(r"（.*）", "", text)
     text = re.sub(r"「.*」", "", text)
@@ -44,7 +46,13 @@ def summarize(df_segmented: pd.DataFrame, config_manager: ConfigManager, key_tex
     text_result = "".join(list_result)
     model = Elyza(config_manager=config_manager)
     release_gpu_memory(model)
-    _text = model.get_result(text_result, task="summarize")
+    _text = model.get_result(text_result, task="punctuation")
+    _text = preprocess(_text)
+    list_result = [_text]
+
+    model = Elyza(config_manager=config_manager)
+    release_gpu_memory(model)
+    _text = model.get_result(text_result, task="last_summarize")
     _text = preprocess(_text)
     list_result.append(_text)
     df = pd.DataFrame(list_result, columns=[key_text])
