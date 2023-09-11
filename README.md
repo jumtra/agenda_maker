@@ -1,6 +1,10 @@
 # 議事録生成AI
 ![agenda_ai.png](doc/img/agenda_ai.drawio.png)
 
+
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1C4h68lQ3NLDVkbci1rruF9Bn2V_bIzdd?usp=sharing)
+
 動画や音声データを入力として、文字起こし、話者割り当てと要約の結果を出力します。
 
 ## 概要
