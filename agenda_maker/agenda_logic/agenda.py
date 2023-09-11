@@ -127,8 +127,13 @@ def _get_list_transcript(df: pd.DataFrame) -> list:
 def _summary_format(texts: str):
     sents = texts.split("。")
     list_text = []
-    for s in sents:
-        list_text.append(s + "。" + "\n")
+    last_num = len(sents) - 1
+    for s_num, s in enumerate(sents):
+        if s_num == last_num:
+            list_text.append(s + "\n")
+        else:
+            list_text.append(s + "。" + "\n")
+
     return list_text
 
 
