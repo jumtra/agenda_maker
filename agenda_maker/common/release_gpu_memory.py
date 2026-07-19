@@ -3,7 +3,7 @@ from logging import getLogger
 
 import torch
 
-logger = getLogger()
+logger = getLogger(__name__)
 
 __all__ = ["release_gpu_memory"]
 

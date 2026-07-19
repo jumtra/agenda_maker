@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import ClassVar
+from typing import Any
 
 import torch
 
@@ -10,8 +10,6 @@ class BaseModel(ABC):
     def __init__(self, config_manager: ConfigManager, *args, **kwargs) -> None:
         self.config_manager = config_manager
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-
-    model_name: ClassVar[str]
 
     @abstractmethod
     def set_params(self, *args, **kwargs) -> None:
@@ -24,6 +22,6 @@ class BaseModel(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_result(self, *args, **kwargs) -> None:
+    def get_result(self, *args, **kwargs) -> Any:
         """結果を取得する"""
         raise NotImplementedError

@@ -6,9 +6,8 @@ __all__ = ["add_log_handler"]
 
 def add_log_handler(output_dir):
     """
-    同じログファイルに出力する'verbose_logger'と'simple_logger'という2種類のロガーを作成します。
-    'verbose_logger'は実行時間、ログレベル、モジュール名、関数名とメッセージを出力するロガーです。
-    'simple_logger'はメッセージのみを出力するロガーです。
+    同じログファイルに出力するロガーを作成します。
+    実行時間、ログレベル、モジュール名、関数名とメッセージを出力します。
 
     Parameters
     ----------
@@ -38,17 +37,5 @@ def add_log_handler(output_dir):
     handler.setFormatter(verbose_fmt)
     verbose_logger.addHandler(handler)
 
-    # simple_logger = getLogger(f"simple_logger")
-    # simple_fmt = Formatter("%(message)s")
-    # simple_logger.setLevel("DEBUG")
-    # handler = StreamHandler()
-    # handler.setLevel("INFO")
-    # handler.setFormatter(simple_fmt)
-    # simple_logger.addHandler(handler)
-
-    # handler = FileHandler(f"{output_dir}/simple_log.log", mode="a", encoding="utf8")
-    # handler.setLevel("DEBUG")
-    # handler.setFormatter(simple_fmt)
-    # simple_logger.addHandler(handler)
     verbose_logger.info(f"log_file = {log_file}")
     return verbose_logger

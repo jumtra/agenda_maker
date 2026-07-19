@@ -7,7 +7,7 @@ from pydub.silence import split_on_silence
 
 from agenda_maker.common import ConfigManager
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def preprocess(path_input: str, config_manager: ConfigManager) -> str:
@@ -27,7 +27,7 @@ def preprocess(path_input: str, config_manager: ConfigManager) -> str:
         logger.info("skip convert to wav")
         path_wav_input = path_input
     else:
-        logger.error(Exception("only use mp3,mp4,wav"))
+        raise ValueError("only use mp3,mp4,wav")
     if config_manager.config.tasks.is_wav_preprocess:
         preprocess_wav(path_input=path_wav_input, config_manager=config_manager)
     else:
