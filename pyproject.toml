@@ -38,6 +38,10 @@ black = "^23.7.0"
 isort = "^5.12.0"
 mypy = "^1.5.1"
 
+[tool.poetry.scripts]
+agenda-maker = "agenda_maker.cli:main"
+agenda-maker-app = "agenda_maker.app:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -48,7 +52,7 @@ include_trailing_comma = true
 multi_line_output = 3
 line_length = 130
 profile = "black"
-known_first_party = "agenda_maker/"
+known_first_party = "agenda_maker"
 
 [tool.mypy]
 files = [

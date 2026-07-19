@@ -1,4 +1,3 @@
-import re
 import unicodedata
 from dataclasses import dataclass
 from logging import getLogger
@@ -8,6 +7,7 @@ import pandas as pd
 import whisperx
 
 from agenda_maker.common.release_gpu_memory import release_gpu_memory
+from agenda_maker.common.text_cleanup import remove_text_noise
 from agenda_maker.model.base_model import BaseModel
 
 logger = getLogger(__name__)
@@ -33,17 +33,7 @@ class ResultWhisper:
 
     def remove_noise(self, text: str) -> str:
         """ノイズ除去"""
-        text = re.sub(r"【.*】", "", text)
-        text = re.sub(r"（.*）", "", text)
-        text = re.sub(r"「.*」", "", text)
-        text = re.sub(r"[［］\[\]]", " ", text)  # ［］の除去
-        text = re.sub(r"[@＠]\w+", "", text)  # メンションの除去
-        text = re.sub(r"https?:\/\/.*?[\r\n ]", "", text)  # URLの除去
-        text = re.sub(r"　", " ", text)  # 全角空白の除去
-        text = text.replace("\u200b", "")
-        text = text.replace("おだしょー", "")  # whisper特有のバグワード
-        text = text.replace("/", "")
-        return text
+        return remove_text_noise(text, extra_replacements=("おだしょー",))
 
     def remove_min_text(self, text: str, min_length: int) -> str:
         if len(text) <= min_length:

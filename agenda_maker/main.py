@@ -1,69 +1,52 @@
 from pathlib import Path
 
 from agenda_maker.agenda_logic.preprocess import preprocess
-from agenda_maker.common import ConfigManager, add_log_handler, script_run
+from agenda_maker.common import ConfigManager, DEFAULT_CONFIG_PATH, add_log_handler, script_run
 
 
 def make_agenda(
-    path_input: str = "sample_data/sample.mp4", config_path: str = "agenda_maker/config/config.yaml", output_name: str = "test"
-):
+    path_input: str = "sample_data/sample.mp4",
+    config_path: str = DEFAULT_CONFIG_PATH,
+    output_name: str = "result",
+) -> None:
     """GPU Memを完全にkillするためにscript_runでscriptを随時実行"""
-    # loggerの設定
     logging = add_log_handler(output_dir="./")
 
-    if path_input is None:
-        logging.error("-inまたは--input CLIで入力ファイルのパスを指定してください")
-        raise Exception("-inまたは--input CLIで入力ファイルのパスを指定してください")
-    # configfile読み込む
-    config_dir = str("/".join(Path(config_path).parts[:-1]))
-    config_yaml_path = str(Path(config_path).parts[-1])
-    config_manager = ConfigManager.from_yaml(
-        config_yaml_path=config_yaml_path,
-        config_dir=config_dir,
-    )
+    if not path_input:
+        message = "-inまたは--input CLIで入力ファイルのパスを指定してください"
+        logging.error(message)
+        raise ValueError(message)
 
-    # 親パスの取得
+    config_manager = ConfigManager.from_path(config_path)
     parent_path = Path(__file__).resolve().parent
+    common_cmd = ["--config_path", config_path, "--output_name", output_name]
 
     logging.info(f"config_file = {config_path}")
     logging.info("<処理開始>")
-    logging.info("文字起こし開始")
-    # transcription
-    if config_manager.config.tasks.is_transcript:
-        # preprocess
-        logging.info("入力データの変換前処理開始")
-        path_input = preprocess(path_input=path_input, config_manager=config_manager)
-        logging.info("入力データの変換前処理終了")
-        script_run(
-            script=str((parent_path / "agenda_logic/transcript.py").absolute()),
-            cmd=["--config_path", config_path, "--input", path_input, "--output_name", output_name],
-        )
-    logging.info("文字起こし終了")
-    # segmentation
-    logging.info("文章の段落分割開始")
-    if config_manager.config.tasks.is_segmentate:
-        script_run(
-            script=str((parent_path / "agenda_logic/segmentate.py").absolute()),
-            cmd=["--config_path", config_path, "--output_name", output_name],
-        )
-    logging.info("文章の段落分割終了")
 
-    # summarization
-    logging.info("文章の要約開始")
-    if config_manager.config.tasks.is_summarize:
-        script_run(
-            script=str((parent_path / "agenda_logic/summarize.py").absolute()),
-            cmd=["--config_path", config_path, "--output_name", output_name],
-        )
-    logging.info("文章の要約終了")
+    stages = [
+        ("文字起こし", "is_transcript", "agenda_logic/transcript.py", True),
+        ("文章の段落分割", "is_segmentate", "agenda_logic/segmentate.py", False),
+        ("文章の要約", "is_summarize", "agenda_logic/summarize.py", False),
+        ("議事録の生成", None, "agenda_logic/agenda.py", False),
+    ]
 
-    # make agenda
-    logging.info("議事録の生成開始")
-    script_run(
-        script=str((parent_path / "agenda_logic/agenda.py").absolute()),
-        cmd=["--config_path", config_path, "--output_name", output_name],
-    )
-    logging.info("議事録の生成終了")
+    for label, task_flag, script_name, needs_preprocess in stages:
+        enabled = True if task_flag is None else bool(getattr(config_manager.config.tasks, task_flag))
+        logging.info(f"{label}開始")
+        if enabled:
+            cmd = list(common_cmd)
+            if needs_preprocess:
+                logging.info("入力データの変換前処理開始")
+                path_input = preprocess(path_input=path_input, config_manager=config_manager)
+                logging.info("入力データの変換前処理終了")
+                cmd.extend(["--input", path_input])
+            script_run(
+                script=str((parent_path / script_name).absolute()),
+                cmd=cmd,
+            )
+        logging.info(f"{label}終了")
+
     logging.info("<処理終了>")
 
 
